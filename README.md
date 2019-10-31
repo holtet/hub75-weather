@@ -20,3 +20,6 @@ make build-python PYTHON=$(which python3)
 sudo make install-python PYTHON=$(which python3)
 
 Switch off on-board sound (`dtparam=audio=off` in `/boot/config.txt`).
+
+
+![](./20191031_132618.jpg)
