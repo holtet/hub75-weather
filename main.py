@@ -227,8 +227,8 @@ class IndoorEnvironmentFetcherThread(Thread):
             except Exception as e:
                 print(f'Failed to calibrate bme280 {str(e)}')
                 time.sleep(5)
-#-        apds = APDS9960(bus)
-#-        apds.enableLightSensor()
+        apds = APDS9960(bus)
+        apds.enableLightSensor()
 #        apds.enableGestureSensor()
         while not self.stopped.wait(0):
             try:
@@ -242,7 +242,7 @@ class IndoorEnvironmentFetcherThread(Thread):
                 print(f'Failed to fetch indoor environment {str(e)}')
 
             try:
-#-                self.collection.ambient_light = apds.readAmbientLight()
+                self.collection.ambient_light = apds.readAmbientLight()
                 if False:
                 #                if apds.isGestureAvailable():
                     print(f"gesture available")
@@ -254,7 +254,6 @@ class IndoorEnvironmentFetcherThread(Thread):
                         new_env_data.time_offset -= 15
             except Exception as e:
                 print(f'Failed to fetch brightness {str(e)}')
-
 
             time.sleep(1)
 #                print("Gesture={}".format(dirs.get(motion, "unknown")))            
@@ -273,7 +272,6 @@ class MyPrinterThread(Thread):
 
 class TrainDepartureFetcherThread(Thread):
     API_CLIENT_ID = 'holtet-hub75display'
-    FILE_NAME = "destinations.txt"
 
     def __init__(self, event, collection: DataCollection, config):
         Thread.__init__(self)
@@ -282,14 +280,15 @@ class TrainDepartureFetcherThread(Thread):
         self.config = config
 
     def run(self):
-        self.destinations = self.config["TRAINS"]["destinations"].split(",")  ##[line.rstrip('\n') for line in open(self.FILE_NAME)]
+        self.destinations = self.config["TRAINS"]["destinations"].split(",")
         while not self.stopped.wait(0):
             try:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
                 loop.run_until_complete(self.print_train_delay())
             except Exception as e:
-                print(str(e))
+                print(f'Failed to fetch train times {str(e)}')
+#                print(str(e))
             time.sleep(300)
 
     async def print_train_delay(self):
@@ -321,6 +320,7 @@ class TrainDepartureFetcherThread(Thread):
                 self.collection.departure_list[dindex] = Departure("", "", 0, 0)
                 dindex += 1
 
+                
 class LedDisplayThread(Thread):
     def __init__(self, event, collection: DataCollection):
         Thread.__init__(self)
@@ -360,82 +360,84 @@ class LedDisplayThread(Thread):
         orange = graphics.Color(128, 75, 0)
 
         while True:
-            offscreen_canvas.Clear()
-            offscreen_canvas.brightness = self.collection.brightness * min(self.collection.ambient_light+10, 100)
-            if (self.collection.screen == 0):
-                graphics.DrawLine(offscreen_canvas, 0, 1, 63, 1, darkBlue)
+            try:
+                offscreen_canvas.Clear()
+                offscreen_canvas.brightness = self.collection.brightness * min(self.collection.ambient_light*2+10, 100)
+                if (self.collection.screen == 0):
+                    graphics.DrawLine(offscreen_canvas, 0, 1, 63, 1, darkBlue)
 
-                for index, dep in enumerate(self.collection.departure_list, start=0):
-                    if (dep.delay < 1):
-                        dep_color = green
-                    elif (dep.delay < 8):
-                        dep_color = orange
-                    else:
-                        dep_color = red
+                    for index, dep in enumerate(self.collection.departure_list, start=0):
+                        if (dep.delay < 1):
+                            dep_color = green
+                        elif (dep.delay < 8):
+                            dep_color = orange
+                        else:
+                            dep_color = red
 
-                    y0 = index * 6 + 2
-                    y1 = y0 + 5
-                    text_length = graphics.DrawText(offscreen_canvas, font, dep.display.pos, y1, dep_color, dep.text1())
-                    dep.display.scroll(text_length)
-                    for y in range(y0, y1):
-                        graphics.DrawLine(offscreen_canvas, 45, y, 63, y, black)
-                    graphics.DrawLine(offscreen_canvas, 45 - 1, y0, 45 - 1, y1, darkBlue)
-                    graphics.DrawLine(offscreen_canvas, 0, y1, 63, y1, darkBlue)
-                    graphics.DrawText(offscreen_canvas, font, 45, y1, dep_color, dep.text2())
-                offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
-                time.sleep(0.03)                        
-                        
-            elif (self.collection.screen == 1):
-                graphics.DrawLine(offscreen_canvas, 0, 5, 63, 5, darkBlue)
-                graphics.DrawText(offscreen_canvas, font, 2, 5, red, f'{self.collection.datetime}')
-                indoor = self.collection.indoor_environment_data
-                temp_text_length  = graphics.DrawText(offscreen_canvas, font2, 0, 14, green, f'{indoor.temperature:.2f} C')
-                graphics.DrawText(offscreen_canvas, font2, 0, 23, green, f'{indoor.humidity:.2f} %')
-                graphics.DrawText(offscreen_canvas, font2, 0, 32, green, f'{indoor.pressure:.1f} hPa')
-                graphics.DrawCircle(offscreen_canvas, temp_text_length - 8, 8, 1, green)
-                offscreen_canvas.SetImage(home_image, 45, 7)
-                offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
-                time.sleep(0.1)
+                        y0 = index * 6 + 2
+                        y1 = y0 + 5
+                        text_length = graphics.DrawText(offscreen_canvas, font, dep.display.pos, y1, dep_color, dep.text1())
+                        dep.display.scroll(text_length)
+                        for y in range(y0, y1):
+                            graphics.DrawLine(offscreen_canvas, 45, y, 63, y, black)
+                            graphics.DrawLine(offscreen_canvas, 45 - 1, y0, 45 - 1, y1, darkBlue)
+                            graphics.DrawLine(offscreen_canvas, 0, y1, 63, y1, darkBlue)
+                            graphics.DrawText(offscreen_canvas, font, 45, y1, dep_color, dep.text2())
+                    offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
+                    time.sleep(0.03)                                                
+                elif (self.collection.screen == 1):
+                    graphics.DrawLine(offscreen_canvas, 0, 5, 63, 5, darkBlue)
+                    graphics.DrawText(offscreen_canvas, font, 2, 5, red, f'{self.collection.datetime}')
+                    indoor = self.collection.indoor_environment_data
+                    temp_text_length  = graphics.DrawText(offscreen_canvas, font2, 0, 14, green, f'{indoor.temperature:.2f} C')
+                    graphics.DrawText(offscreen_canvas, font2, 0, 23, green, f'{indoor.humidity:.2f} %')
+                    graphics.DrawCircle(offscreen_canvas, temp_text_length - 8, 8, 1, green)
+                    graphics.DrawText(offscreen_canvas, font2, 0, 32, green, f'{indoor.pressure:.1f} hPa')
+                    offscreen_canvas.SetImage(home_image, 45, 7)
+                    offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
+                    time.sleep(0.1)
 
-            elif (self.collection.screen == 2):
-                outdoor = self.collection.current_weather_data
-                graphics.DrawLine(offscreen_canvas, 0, 5, 63, 5, darkBlue)
-                header_text_length = graphics.DrawText(offscreen_canvas, font, outdoor.header_text.pos, 5, red, outdoor.header_text.text)
-                outdoor.header_text.scroll(header_text_length)
-                graphics.DrawText(offscreen_canvas, font2, 0, 14, green, f'{outdoor.temperature} C')
-                graphics.DrawText(offscreen_canvas, font2, 0, 23, green, f'{outdoor.humidity} %')
-                offscreen_canvas.SetImage(outdoor.weather_icon, 45, 7)
+                elif (self.collection.screen == 2):
+                    outdoor = self.collection.current_weather_data
+                    graphics.DrawLine(offscreen_canvas, 0, 5, 63, 5, darkBlue)
+                    header_text_length = graphics.DrawText(offscreen_canvas, font, outdoor.header_text.pos, 5, red, outdoor.header_text.text)
+                    outdoor.header_text.scroll(header_text_length)
+                    temp_text_length  = graphics.DrawText(offscreen_canvas, font2, 0, 14, green, f'{outdoor.temperature} C')
+                    graphics.DrawCircle(offscreen_canvas, temp_text_length - 8, 8, 1, green)
+                    graphics.DrawText(offscreen_canvas, font2, 0, 23, green, f'{outdoor.humidity} %')
+                    offscreen_canvas.SetImage(outdoor.weather_icon, 45, 7)
 
 #                detail1_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text1.pos, 25, green, outdoor.detail_text1.text)
 #                outdoor.detail_text1.scroll(detail1_length)
-                detail2_length = graphics.DrawText(offscreen_canvas, font2, outdoor.detail_text2.pos, 31, green, outdoor.detail_text2.text)
-                outdoor.detail_text2.scroll(detail2_length)
-                
-                graphics.DrawCircle(offscreen_canvas, 33, 8, 1, green)
-                offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
-                time.sleep(0.03)
+                    detail2_length = graphics.DrawText(offscreen_canvas, font2, outdoor.detail_text2.pos, 31, green, outdoor.detail_text2.text)
+                    outdoor.detail_text2.scroll(detail2_length)                
+                    offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
+                    time.sleep(0.03)
 
-            elif (self.collection.screen == 3 or self.collection.screen == 4 or self.collection.screen == 5):
-                offset = 0
-                if(self.collection.screen == 4):
-                    offset = 4
-                elif(self.collection.screen == 5):
-                    offset = 8
-                graphics.DrawLine(offscreen_canvas, 0, 5, 63, 5, darkBlue)
-                graphics.DrawText(offscreen_canvas, font, 0, 5, purple, f'{self.collection.current_weather_data.city}  {self.collection.forecast_list[offset].weekday}')
+                elif (self.collection.screen == 3 or self.collection.screen == 4 or self.collection.screen == 5):
+                    offset = 0
+                    if(self.collection.screen == 4):
+                        offset = 4
+                    elif(self.collection.screen == 5):
+                        offset = 8
+                    graphics.DrawLine(offscreen_canvas, 0, 5, 63, 5, darkBlue)
+                    graphics.DrawText(offscreen_canvas, font, 0, 5, purple, f'{self.collection.current_weather_data.city}  {self.collection.forecast_list[offset].weekday}')
 
-                graphics.DrawText(offscreen_canvas, font, 0, 11, green, f'{self.collection.forecast_list[offset].timestr} {self.collection.forecast_list[offset].temp}C')
+                    graphics.DrawText(offscreen_canvas, font, 0, 11, green, f'{self.collection.forecast_list[offset].timestr} {self.collection.forecast_list[offset].temp}C')
 #                graphics.DrawText(offscreen_canvas, font, 0, 17, green, f'{self.collection.forecast_list[offset].weather_desc}')
-                detail_length1 = graphics.DrawText(offscreen_canvas, font, self.collection.forecast_list[offset].detail_text.pos, 17, green, f'{self.collection.forecast_list[offset].detail_text.text}')
-                self.collection.forecast_list[offset].detail_text.scroll(detail_length1)
-                graphics.DrawLine(offscreen_canvas, 0, 18, 63, 18, darkBlue)
-                graphics.DrawText(offscreen_canvas, font, 0, 25, green, f'{self.collection.forecast_list[offset+2].timestr} {self.collection.forecast_list[offset+2].temp}C')
+                    detail_length1 = graphics.DrawText(offscreen_canvas, font, self.collection.forecast_list[offset].detail_text.pos, 17, green, f'{self.collection.forecast_list[offset].detail_text.text}')
+                    self.collection.forecast_list[offset].detail_text.scroll(detail_length1)
+                    graphics.DrawLine(offscreen_canvas, 0, 18, 63, 18, darkBlue)
+                    graphics.DrawText(offscreen_canvas, font, 0, 25, green, f'{self.collection.forecast_list[offset+2].timestr} {self.collection.forecast_list[offset+2].temp}C')
 #                graphics.DrawText(offscreen_canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
-                detail_length2 = graphics.DrawText(offscreen_canvas, font, self.collection.forecast_list[offset+2].detail_text.pos, 31, green, f'{self.collection.forecast_list[offset+2].detail_text.text}')
-                self.collection.forecast_list[offset+2].detail_text.scroll(detail_length2)
-                offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
-                time.sleep(0.03)
-                
+                    detail_length2 = graphics.DrawText(offscreen_canvas, font, self.collection.forecast_list[offset+2].detail_text.pos, 31, green, f'{self.collection.forecast_list[offset+2].detail_text.text}')
+                    self.collection.forecast_list[offset+2].detail_text.scroll(detail_length2)
+                    offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
+                    time.sleep(0.03)            
+            except Exception as e:
+                print(f'Failed to fetch print {str(e)}')
+                time.sleep(3)
+    
 
 # Main function
 if __name__ == "__main__":
