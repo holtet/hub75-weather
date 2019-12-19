@@ -17,62 +17,30 @@ from apds9960 import APDS9960
 from dto import *
 import configparser
 
-start_time =  time.perf_counter()
-
-class ScreenCoordinator(Thread):
-    MAX_SCREEN = 4
-    SECONDS_PER_SCREEN = 10
-    MILLIS_PER_SCREEN = 10000
-    FADE_SECONDS = 2
-    FADE_MILLIS = 2000
-    def __init__(self, event, collection: DataCollection):
-        Thread.__init__(self)
-        self.collection = collection
-        self.stopped = event
-
-    def run(self):
-        while not self.stopped.wait(0):
-            pc = time.perf_counter()
-            secs_since_start = pc - start_time
-            self.collection.screen = int((secs_since_start // self.SECONDS_PER_SCREEN) % self.MAX_SCREEN)
-            secs_since_switch = secs_since_start % self.SECONDS_PER_SCREEN
-            self.collection.current_screen_time = secs_since_switch
-            if (secs_since_switch < self.FADE_SECONDS) :
-                self.collection.brightness = (secs_since_switch / self.FADE_SECONDS)
-            elif (secs_since_switch > (self.SECONDS_PER_SCREEN - self.FADE_SECONDS)):
-                self.collection.brightness = (1 - ((secs_since_switch - self.SECONDS_PER_SCREEN + self.FADE_SECONDS) / self.FADE_SECONDS))
-            else:
-                self.collection.brightness = 1
-#            print(f'{self.collection.brightness}')
-            self.collection.datetime = datetime.datetime.today().strftime("%d/%m  %H:%M:%S")
-            time.sleep(0.05)
-
 
 class ScreenCoordinator2(Thread):
-    screen_secs = [15, 15, 30, 10, 10, 10]
     FADE_SECONDS = 2
-    def __init__(self, event, collection: DataCollection):
+    def __init__(self, event, collection: DataCollection, config: Config):
         Thread.__init__(self)
-        self.collection = collection
         self.stopped = event
-
+        self.collection = collection
+        self.config = config
+        
     def run(self):
-        max_screen = len(self.screen_secs)
-        total_rotation_secs = 0
-        for seconds in self.screen_secs:
-            total_rotation_secs += seconds
+        layout = TimePeriod("Default", [15, 15, 30, 10, 10, 10])
+        start_time =  time.perf_counter()
 
         while not self.stopped.wait(0):
             pc = time.perf_counter() + self.collection.indoor_environment_data.time_offset
             secs_since_start = pc - start_time
-            secs_since_rotation_start = secs_since_start % total_rotation_secs
+            secs_since_rotation_start = secs_since_start % layout.total_rotation_secs
             time_count = 0
             prev_time_count = 0
             current_screen = -1
-            while (time_count <= secs_since_rotation_start and current_screen < max_screen):
+            while (time_count <= secs_since_rotation_start and current_screen < layout.max_screen):
                 current_screen += 1
                 prev_time_count = time_count
-                time_count += self.screen_secs[current_screen]
+                time_count += layout.times[current_screen]
 
             secs_since_switch = secs_since_rotation_start - prev_time_count
             secs_until_switch = time_count - secs_since_rotation_start
@@ -84,20 +52,47 @@ class ScreenCoordinator2(Thread):
                 self.collection.brightness = 1
             self.collection.screen = current_screen
             self.collection.current_screen_time = secs_since_switch
-            self.collection.datetime = datetime.datetime.today().strftime("%d/%m  %H:%M:%S")
+
+            subsecond = (pc - start_time) % 1
+            subsecond_half = subsecond - 0.5
+            drift = 0
+
+            # On the "exact" second
+            if(subsecond < 0.05):
+                drift = subsecond
+                self.collection.datetime = datetime.datetime.today().strftime("%d/%m  %H:%M:%S")
 #            print(f'{secs_since_rotation_start:.1f}, Screen:{current_screen}, timeCount:{time_count}, SSS:{secs_since_switch:.1f}, SUS:{secs_until_switch:.1f}, B:{self.collection.brightness:.1f})
-            time.sleep(0.05)
+            # On the "exact" half-second right before starting a new round through screens
+            if(subsecond_half > 0 and subsecond_half < 0.05 and secs_until_switch < 1 and current_screen == layout.max_active_screen):
+                t = datetime.datetime.today()
+#                print(f'current_screen {current_screen} max {layout.max_active_screen}')
+                print(f'min {t.minute} hour {t.hour} weekday {t.weekday()+1} day {t.day} month {t.month}')
+                for tp in self.config.time_periods:
+                    mmatch = tp.minutes == None or tp.minutes.__contains__(t.minute)
+                    hmatch = tp.hours == None or tp.hours.__contains__(t.hour)
+                    wdmatch = tp.weekdays == None or tp.weekdays.__contains__(t.weekday()+1)
+                    dmatch = tp.days == None or tp.days.__contains__(t.day)
+                    momatch = tp.months == None or tp.months.__contains__(t.month)
+#                    print(f'time_period {str(tp)} matches: {mmatch and hmatch and wdmatch and dmatch and momatch}')
+                    if mmatch and hmatch and wdmatch and dmatch and momatch:
+                        layout = tp
+                        print(f'using layout {layout.layout}')
+#                        if current_time_period != None:
+#                            print(f"Overlapping time periods {current_time_period.layout} and {tp.layout}")
+                        
+#                        current_time_period = tp
+            time.sleep(0.05-drift)
 
 
 class WeatherForecastFetcherThread(Thread):
     
-    def __init__(self, event, collection: DataCollection, config):
+    def __init__(self, event, collection: DataCollection, config: Config):
         Thread.__init__(self)
         self.collection = collection
         self.stopped = event
-        api_key = config["WEATHER"]["apiKey"]
-        city_id = config["WEATHER"]["cityId"]
-        self.OWM_str_forecast = f'http://api.openweathermap.org/data/2.5/forecast?id={city_id}&appid={api_key}'
+#        api_key = config.api_key #["WEATHER"]["apiKey"]
+#        city_id = config.city_id #["WEATHER"]["cityId"]
+        self.OWM_str_forecast = f'http://api.openweathermap.org/data/2.5/forecast?id={config.city_id}&appid={config.api_key}'
 
     def to_float_str(self, input):
         return str(round(float(input), 2))
@@ -150,14 +145,14 @@ def read_icon(cwd: CurrentWeatherData):
 
 class CurrentWeatherFetcherThread(Thread):
     
-    def __init__(self, event, collection: DataCollection, config):
+    def __init__(self, event, collection: DataCollection, config: Config):
         Thread.__init__(self)
         self.collection = collection
         self.stopped = event
-        self.config = config
-        api_key = config["WEATHER"]["apiKey"]
-        city_id = config["WEATHER"]["cityId"]
-        self.OWM_str_current = f'http://api.openweathermap.org/data/2.5/weather?id={city_id}&appid={api_key}'
+#        self.config = config
+#        api_key = config["WEATHER"]["apiKey"]
+#        city_id = config["WEATHER"]["cityId"]
+        self.OWM_str_current = f'http://api.openweathermap.org/data/2.5/weather?id={config.city_id}&appid={config.api_key}'
     
     def run(self):
         while not self.stopped.wait(0):
@@ -273,14 +268,14 @@ class MyPrinterThread(Thread):
 class TrainDepartureFetcherThread(Thread):
     API_CLIENT_ID = 'holtet-hub75display'
 
-    def __init__(self, event, collection: DataCollection, config):
+    def __init__(self, event, collection: DataCollection, config: Config):
         Thread.__init__(self)
         self.stopped = event
         self.collection = collection
         self.config = config
 
     def run(self):
-        self.destinations = self.config["TRAINS"]["destinations"].split(",")
+#        self.destinations = self.config["TRAINS"]["destinations"].split(",")
         while not self.stopped.wait(0):
             try:
                 loop = asyncio.new_event_loop()
@@ -293,7 +288,7 @@ class TrainDepartureFetcherThread(Thread):
 
     async def print_train_delay(self):
         async with aiohttp.ClientSession() as client:
-            stop_id = f'NSR:StopPlace:{self.config["TRAINS"]["stopId"]}'
+            stop_id = f'NSR:StopPlace:{self.config.stop_id}'
             stops = [stop_id]
             data = EnturPublicTransportData(
                 client_name=self.API_CLIENT_ID,
@@ -309,7 +304,7 @@ class TrainDepartureFetcherThread(Thread):
 #                print(f'|{call.front_display}|')
 #                for d in self.destinations:
 #                    print(f'destination: |{d}|')
-                if dindex < 5 and call.front_display in self.destinations:# or (1 == 1):
+                if dindex < 5 and call.front_display in self.config.destinations:# or (1 == 1):
                     old_pos = self.collection.departure_list[dindex].pos
                     departure = Departure(call.front_display, call.aimed_departure_time, call.delay_in_min, old_pos)
                     self.collection.departure_list[dindex] = departure
@@ -441,8 +436,9 @@ class LedDisplayThread(Thread):
 
 # Main function
 if __name__ == "__main__":
-    config = configparser.ConfigParser()
-    config.read('config.ini')
+    configp = configparser.ConfigParser()
+    configp.read('config.ini')
+    config = Config(configp)
     
     dataCollection = DataCollection()
 
@@ -454,7 +450,7 @@ if __name__ == "__main__":
     thread3 = IndoorEnvironmentFetcherThread(stopFlag, dataCollection)
     thread3.start()
 
-    thread4 = ScreenCoordinator2(stopFlag, dataCollection)
+    thread4 = ScreenCoordinator2(stopFlag, dataCollection, config)
     thread4.start()
 
     thread5 = CurrentWeatherFetcherThread(stopFlag, dataCollection, config)
