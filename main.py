@@ -11,20 +11,24 @@ import asyncio
 from enturclient import EnturPublicTransportData
 from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
 from PIL import Image
-
 from apds9960.const import *
 from apds9960 import APDS9960
 from dto import *
+from const import *
 import configparser
+from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
+from apscheduler.schedulers.background import BackgroundScheduler
+#from apscheduler.schedulers.blocking import BlockingScheduler
 
 
-class ScreenCoordinator2(Thread):
+class Coordinator(Thread):
     FADE_SECONDS = 2
-    def __init__(self, event, collection: DataCollection, config: Config):
+    def __init__(self, event, collection: DataCollection, config: Config, scheduler: BackgroundScheduler):
         Thread.__init__(self)
         self.stopped = event
         self.collection = collection
         self.config = config
+        self.scheduler = scheduler
         
     def run(self):
         layout = TimePeriod("Default", [15, 15, 30, 10, 10, 10])
@@ -66,7 +70,7 @@ class ScreenCoordinator2(Thread):
             if(subsecond_half > 0 and subsecond_half < 0.05 and secs_until_switch < 1 and current_screen == layout.max_active_screen):
                 t = datetime.datetime.today()
 #                print(f'current_screen {current_screen} max {layout.max_active_screen}')
-                print(f'min {t.minute} hour {t.hour} weekday {t.weekday()+1} day {t.day} month {t.month}')
+#                print(f'min {t.minute} hour {t.hour} weekday {t.weekday()+1} day {t.day} month {t.month}')
                 for tp in self.config.time_periods:
                     mmatch = tp.minutes == None or tp.minutes.__contains__(t.minute)
                     hmatch = tp.hours == None or tp.hours.__contains__(t.hour)
@@ -75,31 +79,58 @@ class ScreenCoordinator2(Thread):
                     momatch = tp.months == None or tp.months.__contains__(t.month)
 #                    print(f'time_period {str(tp)} matches: {mmatch and hmatch and wdmatch and dmatch and momatch}')
                     if mmatch and hmatch and wdmatch and dmatch and momatch:
+                        if layout != tp:
+                            print(f'switching layout from {layout.layout} to {tp.layout}')
+                        self.check_pause_resume_job(layout.has_trains(), tp.has_trains(), TDF_JOB_ID)
+#                        if (not tp.has_trains() and layout.has_trains()):
+#                            print("Pausing tdf job")
+#                            scheduler.pause_job(TDF_JOB_ID)
+#                        elif (tp.has_trains() and not layout.has_trains()):
+#                            print("Resuming tdf job")
+#                            scheduler.resume_job(TDF_JOB_ID)
+                        if (not tp.has_forecast() and layout.has_forecast()):
+                            print("Pausing wff job")
+                            scheduler.pause_job(WFF_JOB_ID)
+                        elif (tp.has_forecast() and not layout.has_forecast()):
+                            print("Resuming wff job")
+                            scheduler.resume_job(WFF_JOB_ID)
+                        if (not tp.has_outdoor() and layout.has_outdoor()):
+                            print("Pausing cwf job")
+                            scheduler.pause_job(CWF_JOB_ID)
+                        elif (tp.has_outdoor() and not layout.has_outdoor()):
+                            print("Resuming cwf job")
+                            scheduler.resume_job(CWF_JOB_ID)
                         layout = tp
-                        print(f'using layout {layout.layout}')
 #                        if current_time_period != None:
-#                            print(f"Overlapping time periods {current_time_period.layout} and {tp.layout}")
-                        
+#                            print(f"Overlapping time periods {current_time_period.layout} and {tp.layout}")                        
 #                        current_time_period = tp
             time.sleep(0.05-drift)
 
+    def check_pause_resume_job(self, old, new, job_id):
+        if (old and not new):
+            print(f'Pausing {job_id}')
+            self.scheduler.pause_job(job_id)
+        elif (new and not old):
+            print(f'Resuming {job_id}')
+            self.scheduler.resume_job(job_id)
+        
 
-class WeatherForecastFetcherThread(Thread):
+class WeatherForecastFetcher():
     
-    def __init__(self, event, collection: DataCollection, config: Config):
-        Thread.__init__(self)
+    def __init__(self, collection: DataCollection, config: Config):
+#        Thread.__init__(self)
         self.collection = collection
-        self.stopped = event
-#        api_key = config.api_key #["WEATHER"]["apiKey"]
-#        city_id = config.city_id #["WEATHER"]["cityId"]
+#        self.stopped = event
         self.OWM_str_forecast = f'http://api.openweathermap.org/data/2.5/forecast?id={config.city_id}&appid={config.api_key}'
 
     def to_float_str(self, input):
         return str(round(float(input), 2))
 
     def run(self):
-        while not self.stopped.wait(0):
+        if True:
+#        while not self.stopped.wait(0):
             try:
+                print("Fetching weather forecast")
                 response = requests.get(self.OWM_str_forecast)#.json
 #                print(response.content)
                 response2 = response.json()
@@ -122,13 +153,15 @@ class WeatherForecastFetcherThread(Thread):
                                 fore.snow_3h = float(forecast['snow']['3h'])
                         fore.set_detail_text()
                         self.collection.forecast_list.append(fore)
-                    time.sleep(3600)
+#                    time.sleep(3600)
                 else:
                     print("not found")
-                    time.sleep(600)
+                    raise Exception
+#                    time.sleep(600)
             except Exception as e:
                 print(f'Weather forecast fetcher failed: {str(e)}')
-                time.sleep(600)
+                raise e
+#                time.sleep(600)
 
 
 def to_float_str(input):
@@ -143,20 +176,21 @@ def read_icon(cwd: CurrentWeatherData):
         cwd.weather_icon = Image.open('unknown.bmp').convert('RGB')
 
 
-class CurrentWeatherFetcherThread(Thread):
+class CurrentWeatherFetcher:
     
-    def __init__(self, event, collection: DataCollection, config: Config):
-        Thread.__init__(self)
+    def __init__(self, collection: DataCollection, config: Config):
+#        Thread.__init__(self)
         self.collection = collection
-        self.stopped = event
+#        self.stopped = event
 #        self.config = config
 #        api_key = config["WEATHER"]["apiKey"]
 #        city_id = config["WEATHER"]["cityId"]
         self.OWM_str_current = f'http://api.openweathermap.org/data/2.5/weather?id={config.city_id}&appid={config.api_key}'
     
     def run(self):
-        while not self.stopped.wait(0):
-            sleep = 3600
+        if True:
+#        while not self.stopped.wait(0):
+#            sleep = 3600
             new_weather_data = CurrentWeatherData()
             try:
                 x = requests.get(self.OWM_str_current).json()
@@ -193,14 +227,17 @@ class CurrentWeatherFetcherThread(Thread):
                     new_weather_data.set_detail_text2()                    
                 else:
                     print("Current weather not found")
-                    sleep = 600
+                    raise Exception("Current weather not found")
+ #                   sleep = 600
             except Exception as e:
                 print(f'Fetching current weather failed: {str(e)}')
-                print(x)
-                sleep = 600
+                raise e
+#                print(x)
+
+#                sleep = 600
             read_icon(new_weather_data)
             self.collection.current_weather_data = new_weather_data
-            time.sleep(sleep)
+#            time.sleep(sleep)
 
             
 class IndoorEnvironmentFetcherThread(Thread):
@@ -265,31 +302,34 @@ class MyPrinterThread(Thread):
             print("*")
 
 
-class TrainDepartureFetcherThread(Thread):
-    API_CLIENT_ID = 'holtet-hub75display'
+class TrainDepartureFetcher:
+#    API_CLIENT_ID = 'holtet-hub75display'
 
-    def __init__(self, event, collection: DataCollection, config: Config):
-        Thread.__init__(self)
-        self.stopped = event
+    def __init__(self, collection: DataCollection, config: Config):
+#        Thread.__init__(self)
+#        self.stopped = event
         self.collection = collection
         self.config = config
 
     def run(self):
-        while not self.stopped.wait(0):
+        if True:
+            print("Fetching train departures")
+#        while not self.stopped.wait(0):
             try:
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
                 loop.run_until_complete(self.print_train_delay())
             except Exception as e:
                 print(f'Failed to fetch train times {str(e)}')
-            time.sleep(300)
+                raise e
+#            time.sleep(300)
 
     async def print_train_delay(self):
         async with aiohttp.ClientSession() as client:
             stop_id = f'NSR:StopPlace:{self.config.stop_id}'
             stops = [stop_id]
             data = EnturPublicTransportData(
-                client_name=self.API_CLIENT_ID,
+                client_name=self.config.entur_client_id,
                 stops=stops,
                 omit_non_boarding=True,
                 number_of_departures=10,
@@ -321,6 +361,7 @@ class LedDisplayThread(Thread):
         self.collection = collection
 
     def run(self):
+        print("Starting display thread")
         options = RGBMatrixOptions()
         options.rows = 32
         options.cols = 64
@@ -356,7 +397,7 @@ class LedDisplayThread(Thread):
             try:
                 offscreen_canvas.Clear()
                 offscreen_canvas.brightness = self.collection.brightness * min(self.collection.ambient_light*2+10, 100)
-                if (self.collection.screen == 0):
+                if (self.collection.screen == SCREEN_TRAINS):
                     graphics.DrawLine(offscreen_canvas, 0, 1, 63, 1, darkBlue)
 
                     for index, dep in enumerate(self.collection.departure_list, start=0):
@@ -378,7 +419,7 @@ class LedDisplayThread(Thread):
                             graphics.DrawText(offscreen_canvas, font, 45, y1, dep_color, dep.text2())
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
                     time.sleep(0.03)                                                
-                elif (self.collection.screen == 1):
+                elif (self.collection.screen == SCREEN_INDOOR):
                     graphics.DrawLine(offscreen_canvas, 0, 5, 63, 5, darkBlue)
                     graphics.DrawText(offscreen_canvas, font, 2, 5, red, f'{self.collection.datetime}')
                     indoor = self.collection.indoor_environment_data
@@ -390,7 +431,7 @@ class LedDisplayThread(Thread):
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
                     time.sleep(0.1)
 
-                elif (self.collection.screen == 2):
+                elif (self.collection.screen == SCREEN_OUTDOOR):
                     outdoor = self.collection.current_weather_data
                     graphics.DrawLine(offscreen_canvas, 0, 5, 63, 5, darkBlue)
                     header_text_length = graphics.DrawText(offscreen_canvas, font, outdoor.header_text.pos, 5, red, outdoor.header_text.text)
@@ -407,11 +448,12 @@ class LedDisplayThread(Thread):
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
                     time.sleep(0.03)
 
-                elif (self.collection.screen == 3 or self.collection.screen == 4 or self.collection.screen == 5):
+#                elif (self.collection.screen in [SCREEN_FORECAST_1, SCREEN_FORECAST_2, SCREEN_FORECAST_3]):
+                elif (self.collection.screen == SCREEN_FORECAST_1 or self.collection.screen == SCREEN_FORECAST_2 or self.collection.screen == SCREEN_FORECAST_3):
                     offset = 0
-                    if(self.collection.screen == 4):
+                    if(self.collection.screen == SCREEN_FORECAST_2):
                         offset = 4
-                    elif(self.collection.screen == 5):
+                    elif(self.collection.screen == SCREEN_FORECAST_3):
                         offset = 8
                     graphics.DrawLine(offscreen_canvas, 0, 5, 63, 5, darkBlue)
                     graphics.DrawText(offscreen_canvas, font, 0, 5, purple, f'{self.collection.current_weather_data.city}  {self.collection.forecast_list[offset].weekday}')
@@ -430,8 +472,25 @@ class LedDisplayThread(Thread):
             except Exception as e:
                 print(f'Failed to fetch print {str(e)}')
                 time.sleep(3)
-    
 
+class Listener:
+    def __init__(self, joblist):
+        self.joblist = joblist
+
+    def job_done_listener(self, event):
+        job = joblist[event.job_id]
+        if event.exception:
+            print(f'The job {event.job_id} crashed')
+            if job.last_success == True:
+                job.job.reschedule(trigger='interval', seconds=interval_error)
+                job.last_success = False
+        else:
+            print(f'The job {event.job_id} was successful')
+            if job.last_success == False:
+                job.job.reschedule(trigger='interval', seconds=interval_ok)
+                job.last_success = True
+
+                                                                                                                                        
 # Main function
 if __name__ == "__main__":
     configp = configparser.ConfigParser()
@@ -440,22 +499,51 @@ if __name__ == "__main__":
     
     dataCollection = DataCollection()
 
+    job_defaults = {
+        'coalesce': True
+    }
+
+    scheduler = BackgroundScheduler(job_defaults = job_defaults)
+    joblist = {}
+
+    wff = WeatherForecastFetcher(dataCollection, config)
+    wff.run()
+    wff_job = scheduler.add_job(wff.run, trigger='interval', seconds=3600, id=WFF_JOB_ID)
+    joblist[WFF_JOB_ID] = Job(wff_job, 3600, 600)
+#    scheduler.add_listener(Listeners(wff_job, 3600, 600).my_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
+#    jobs.wff_job = wff_job
+    
+    tdf = TrainDepartureFetcher(dataCollection, config)
+    tdf.run()
+    tdf_job = scheduler.add_job(tdf.run, trigger='interval', seconds=300, id=TDF_JOB_ID)
+    joblist[TDF_JOB_ID] = Job(tdf_job, 300, 150)
+
+    cwf = CurrentWeatherFetcher(dataCollection, config)
+    cwf.run()
+    cwf_job = scheduler.add_job(cwf.run, trigger='interval', seconds=3600, id=CWF_JOB_ID)
+    joblist[CWF_JOB_ID] = Job(cwf_job, 3600, 600)
+
+    scheduler.add_listener(Listener(joblist).job_done_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
+#    jobs.tdf_job = tdf_job
+    
+    scheduler.start()
+    
     stopFlag = Event()
 
-    thread1 = TrainDepartureFetcherThread(stopFlag, dataCollection, config)
-    thread1.start()
+#    thread1 = TrainDepartureFetcherThread(stopFlag, dataCollection, config)
+#    thread1.start()
 
     thread3 = IndoorEnvironmentFetcherThread(stopFlag, dataCollection)
     thread3.start()
 
-    thread4 = ScreenCoordinator2(stopFlag, dataCollection, config)
+    thread4 = Coordinator(stopFlag, dataCollection, config, scheduler)
     thread4.start()
 
-    thread5 = CurrentWeatherFetcherThread(stopFlag, dataCollection, config)
-    thread5.start()
+#    thread5 = CurrentWeatherFetcherThread(stopFlag, dataCollection, config)
+#    thread5.start()
 
-    thread6 = WeatherForecastFetcherThread(stopFlag, dataCollection, config)
-    thread6.start()
+#    thread6 = WeatherForecastFetcherThread(stopFlag, dataCollection, config)
+#    thread6.start()
     
     run_text = LedDisplayThread(stopFlag, dataCollection)
     run_text.start()
