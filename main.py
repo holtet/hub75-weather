@@ -18,7 +18,6 @@ from const import *
 import configparser
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from apscheduler.schedulers.background import BackgroundScheduler
-#from apscheduler.schedulers.blocking import BlockingScheduler
 
 
 class Coordinator(Thread):
@@ -29,22 +28,24 @@ class Coordinator(Thread):
         self.collection = collection
         self.config = config
         self.scheduler = scheduler
+        self.layout = TimePeriod("Default", [5, 5, 5, 5, 5, 5])
         
     def run(self):
-        layout = TimePeriod("Default", [15, 15, 30, 10, 10, 10])
+#        layout = TimePeriod("Default", [15, 15, 30, 10, 10, 10])
         start_time =  time.perf_counter()
+        drift = 0
 
         while not self.stopped.wait(0):
             pc = time.perf_counter() + self.collection.indoor_environment_data.time_offset
             secs_since_start = pc - start_time
-            secs_since_rotation_start = secs_since_start % layout.total_rotation_secs
+            secs_since_rotation_start = secs_since_start % self.layout.total_rotation_secs
             time_count = 0
             prev_time_count = 0
             current_screen = -1
-            while (time_count <= secs_since_rotation_start and current_screen < layout.max_screen):
+            while (time_count <= secs_since_rotation_start and current_screen < self.layout.max_screen):
                 current_screen += 1
                 prev_time_count = time_count
-                time_count += layout.times[current_screen]
+                time_count += self.layout.times[current_screen]
 
             secs_since_switch = secs_since_rotation_start - prev_time_count
             secs_until_switch = time_count - secs_since_rotation_start
@@ -59,53 +60,58 @@ class Coordinator(Thread):
 
             subsecond = (pc - start_time) % 1
             subsecond_half = subsecond - 0.5
-            drift = 0
 
             # On the "exact" second
-            if(subsecond < 0.05):
+            if(subsecond < 0.1):
                 drift = subsecond
+#                self.collection.datetime = datetime.datetime.today().strftime(self.config.datetime_format)#"%d/%m  %H:%M:%S")
                 self.collection.datetime = datetime.datetime.today().strftime("%d/%m  %H:%M:%S")
 #            print(f'{secs_since_rotation_start:.1f}, Screen:{current_screen}, timeCount:{time_count}, SSS:{secs_since_switch:.1f}, SUS:{secs_until_switch:.1f}, B:{self.collection.brightness:.1f})
             # On the "exact" half-second right before starting a new round through screens
-            if(subsecond_half > 0 and subsecond_half < 0.05 and secs_until_switch < 1 and current_screen == layout.max_active_screen):
-                t = datetime.datetime.today()
+            if(subsecond_half > 0 and subsecond_half < 0.01 and secs_until_switch < 1 and current_screen == self.layout.max_active_screen):
+                self.find_next_timeperiod()
+#                if tp != None:
+#                    print(f'switching layout from {layout.layout} to {tp.layout}')
+#                    self.check_pause_resume_job(layout.has_trains(), tp.has_trains(), TDF_JOB_ID)
+#                    self.check_pause_resume_job(layout.has_forecast(), tp.has_forecast(), WFF_JOB_ID)
+#                    self.check_pause_resume_job(layout.has_outdoor(), tp.has_outdoor(), CWF_JOB_ID)
+#                    self.layout = tp
+#                t = datetime.datetime.today()
 #                print(f'current_screen {current_screen} max {layout.max_active_screen}')
 #                print(f'min {t.minute} hour {t.hour} weekday {t.weekday()+1} day {t.day} month {t.month}')
-                for tp in self.config.time_periods:
-                    mmatch = tp.minutes == None or tp.minutes.__contains__(t.minute)
-                    hmatch = tp.hours == None or tp.hours.__contains__(t.hour)
-                    wdmatch = tp.weekdays == None or tp.weekdays.__contains__(t.weekday()+1)
-                    dmatch = tp.days == None or tp.days.__contains__(t.day)
-                    momatch = tp.months == None or tp.months.__contains__(t.month)
+#                for tp in self.config.time_periods:
+#                    mmatch = tp.minutes == None or tp.minutes.__contains__(t.minute)
+#                    hmatch = tp.hours == None or tp.hours.__contains__(t.hour)
+#                    wdmatch = tp.weekdays == None or tp.weekdays.__contains__(t.weekday()+1)
+#                    dmatch = tp.days == None or tp.days.__contains__(t.day)
+#                    momatch = tp.months == None or tp.months.__contains__(t.month)
 #                    print(f'time_period {str(tp)} matches: {mmatch and hmatch and wdmatch and dmatch and momatch}')
-                    if mmatch and hmatch and wdmatch and dmatch and momatch:
-                        if layout != tp:
-                            print(f'switching layout from {layout.layout} to {tp.layout}')
-                        self.check_pause_resume_job(layout.has_trains(), tp.has_trains(), TDF_JOB_ID)
-#                        if (not tp.has_trains() and layout.has_trains()):
-#                            print("Pausing tdf job")
-#                            scheduler.pause_job(TDF_JOB_ID)
-#                        elif (tp.has_trains() and not layout.has_trains()):
-#                            print("Resuming tdf job")
-#                            scheduler.resume_job(TDF_JOB_ID)
-                        if (not tp.has_forecast() and layout.has_forecast()):
-                            print("Pausing wff job")
-                            scheduler.pause_job(WFF_JOB_ID)
-                        elif (tp.has_forecast() and not layout.has_forecast()):
-                            print("Resuming wff job")
-                            scheduler.resume_job(WFF_JOB_ID)
-                        if (not tp.has_outdoor() and layout.has_outdoor()):
-                            print("Pausing cwf job")
-                            scheduler.pause_job(CWF_JOB_ID)
-                        elif (tp.has_outdoor() and not layout.has_outdoor()):
-                            print("Resuming cwf job")
-                            scheduler.resume_job(CWF_JOB_ID)
-                        layout = tp
-#                        if current_time_period != None:
-#                            print(f"Overlapping time periods {current_time_period.layout} and {tp.layout}")                        
-#                        current_time_period = tp
-            time.sleep(0.05-drift)
+#                    if mmatch and hmatch and wdmatch and dmatch and momatch:
+#                        if layout != tp:
+            time.sleep(0.1-drift/10)
 
+    def find_next_timeperiod(self):
+        t = datetime.datetime.today()
+                #print(f'current_screen {current_screen} max {layout.max_active_screen}')
+                #print(f'min {t.minute} hour {t.hour} weekday {t.weekday()+1} day {t.day} month {t.month}')
+        for tp in self.config.time_periods:
+            mmatch = tp.minutes == None or tp.minutes.__contains__(t.minute)
+            hmatch = tp.hours == None or tp.hours.__contains__(t.hour)
+            wdmatch = tp.weekdays == None or tp.weekdays.__contains__(t.weekday()+1)
+            dmatch = tp.days == None or tp.days.__contains__(t.day)
+            momatch = tp.months == None or tp.months.__contains__(t.month)
+                    #print(f'time_period {str(tp)} matches: {mmatch and hmatch and wdmatch and dmatch and momatch}')
+            if mmatch and hmatch and wdmatch and dmatch and momatch:
+                if self.layout != tp:
+                    print(f'switching layout from {self.layout.layout} to {tp.layout}')
+                    self.check_pause_resume_job(self.layout.has_trains(), tp.has_trains(), TDF_JOB_ID)
+                    self.check_pause_resume_job(self.layout.has_forecast(), tp.has_forecast(), WFF_JOB_ID)
+                    self.check_pause_resume_job(self.layout.has_outdoor(), tp.has_outdoor(), CWF_JOB_ID)
+                    self.layout = tp
+                    return
+#                    return tp
+#        return None
+    
     def check_pause_resume_job(self, old, new, job_id):
         if (old and not new):
             print(f'Pausing {job_id}')
@@ -189,6 +195,7 @@ class CurrentWeatherFetcher:
     
     def run(self):
         if True:
+            print("Fetching current weather")
 #        while not self.stopped.wait(0):
 #            sleep = 3600
             new_weather_data = CurrentWeatherData()

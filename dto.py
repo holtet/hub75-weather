@@ -14,6 +14,7 @@ class Job:
         
 class Config:
     def __init__(self, config):
+        self.datetime_format = config["MAIN"]["datetime_format"]
         self.api_key = config["WEATHER"]["apiKey"]
         self.city_id = config["WEATHER"]["cityId"]
          
