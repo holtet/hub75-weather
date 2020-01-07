@@ -3,68 +3,79 @@ import time
 import re
 import functools
 import operator
+from const import *
 
+class Job:
+    def __init__(self, job, interval_ok, interval_error):
+        self.job = job
+        self.last_success = True
+        self.interval_ok = interval_ok
+        self.interval_error = interval_error
+        
 class Config:
-     def __init__(self, config):
-         self.api_key = config["WEATHER"]["apiKey"]
-         self.city_id = config["WEATHER"]["cityId"]
-         self.destinations = config["TRAINS"]["destinations"].split(",")
-         self.stop_id = config["TRAINS"]["stopId"]
-         self.time_periods = []
-         self.range_re = re.compile(r"\d+-\d+")
+    def __init__(self, config):
+        self.datetime_format = config["MAIN"]["datetime_format"]
+        self.api_key = config["WEATHER"]["apiKey"]
+        self.city_id = config["WEATHER"]["cityId"]
+         
+        self.entur_client_id = config["TRAINS"]["clientId"]
+        self.destinations = config["TRAINS"]["destinations"].split(",")
+        self.stop_id = config["TRAINS"]["stopId"]
 
-         for layout_name in list(filter(lambda x: str(x).startswith("SCREEN_"), config.sections())):
-              print(f'found layout config {layout_name}')
-              times = list(map(int, str(config[layout_name]["times"]).split(",")))
-              for l in str(config[layout_name]["active"]).split("\n"):
-                   time_period = TimePeriod(layout_name, times)
-                   p = l.split(" ")
-                   time_period.minutes = self.conf_to_array(str(p[0]))
-                   time_period.hours = self.conf_to_array(str(p[1]))
-                   time_period.weekdays = self.conf_to_array(str(p[2]))
-                   time_period.days = self.conf_to_array(str(p[3]))
-                   time_period.months = self.conf_to_array(str(p[4]))
-                   self.time_periods.append(time_period)         
+        self.time_periods = []
+        self.range_re = re.compile(r"\d+-\d+")
+
+        for layout_name in list(filter(lambda x: str(x).startswith("SCREEN_"), config.sections())):
+            print(f'found layout config {layout_name}')
+            times = list(map(int, str(config[layout_name]["times"]).split(",")))
+            for l in str(config[layout_name]["active"]).split("\n"):
+                time_period = TimePeriod(layout_name, times)
+                p = l.split(" ")
+                time_period.minutes = self.conf_to_array(str(p[0]))
+                time_period.hours = self.conf_to_array(str(p[1]))
+                time_period.weekdays = self.conf_to_array(str(p[2]))
+                time_period.days = self.conf_to_array(str(p[3]))
+                time_period.months = self.conf_to_array(str(p[4]))
+                self.time_periods.append(time_period)         
             
-     def conf_to_array(self,conf_str):
-          if conf_str == "*":
-               return None
-          items = []
-          mparts = conf_str.split(",")
-          for mpart in mparts:
-               if (self.range_re.match(mpart)):
-                    first_last = list(map(int, mpart.split("-")))
-                    for i in range(int(first_last[0]), int(first_last[1])+1): #TODO: simplify
-                         items.append(i)
-               else:
-                    items.append(int(mpart))
-          return items
+    def conf_to_array(self,conf_str):
+        if conf_str == "*":
+            return None
+        items = []
+        mparts = conf_str.split(",")
+        for mpart in mparts:
+            if (self.range_re.match(mpart)):
+                first_last = list(map(int, mpart.split("-")))
+                for i in range(int(first_last[0]), int(first_last[1])+1): #TODO: simplify
+                    items.append(i)
+            else:
+                items.append(int(mpart))
+        return items
 
-class LayoutOld:
-     def __init__(self, name, times):
-          self.name = name
-          self.times = times
-          self.max_screen = len(times)
-          self.total_rotation_secs = 0
-          for seconds in times:
-               self.total_rotation_secs += seconds
-     
 class TimePeriod:
-     def __init__(self, layout, times):
-          self.times = times
-          self.layout = layout
-          self.minutes = None
-          self.hours  = []
-          self.weekdays = None
-          self.days = None
-          self.months = None
-          self.max_screen = len(times)
-          self.max_active_screen = len(list(filter(lambda x: x > 0, times))) - 1
-          self.total_rotation_secs = functools.reduce(operator.add, times)
-          #          for seconds in times:
-          #               self.total_rotation_secs += seconds
-     def __str__(self):
-          return f'layout {self.layout} minutes {self.minutes} hours {self.hours} weekdays {self.weekdays} days {self.days} months {self.months} -> {self.times}'
+    def __init__(self, layout, times):
+        self.times = times
+        self.layout = layout
+        self.minutes = None
+        self.hours  = []
+        self.weekdays = None
+        self.days = None
+        self.months = None
+        self.max_screen = len(times)
+        self.max_active_screen = len(list(filter(lambda x: x > 0, times))) - 1
+        self.total_rotation_secs = functools.reduce(operator.add, times)
+
+    def has_trains(self):
+        return self.times[SCREEN_TRAINS] > 0
+    
+    def has_outdoor(self):
+        return self.times[SCREEN_OUTDOOR] > 0
+
+    def has_forecast(self):
+        return self.times[SCREEN_FORECAST_1] > 0 or self.times[SCREEN_FORECAST_2] > 0 or self.times[SCREEN_FORECAST_3] > 0
+
+    def __str__(self):
+        return f'layout {self.layout} minutes {self.minutes} hours {self.hours} weekdays {self.weekdays} days {self.days} months {self.months} -> {self.times}'
 
 class Forecast:
     def __init__(self): #, weekday, timestr, temp, weather_desc):
