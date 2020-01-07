@@ -1,11 +1,7 @@
 import bme280
 import smbus2
-import time
-import datetime
-from os import wait
 from threading import Thread, Event
 import requests
-import json
 import aiohttp
 import asyncio
 from enturclient import EnturPublicTransportData
@@ -23,12 +19,12 @@ from apscheduler.schedulers.background import BackgroundScheduler
 class Coordinator(Thread):
     FADE_SECONDS = 2
 
-    def __init__(self, event, collection: DataCollection, config: Config, scheduler: BackgroundScheduler):
+    def __init__(self, event, collection: DataCollection, config1: Config, scheduler1: BackgroundScheduler):
         Thread.__init__(self)
         self.stopped = event
         self.collection = collection
-        self.config = config
-        self.scheduler = scheduler
+        self.config = config1
+        self.scheduler = scheduler1
         self.layout = TimePeriod("Default", [5, 5, 5, 5, 5, 5])
 
     def run(self):
@@ -65,7 +61,6 @@ class Coordinator(Thread):
             if subsecond < 0.1:
                 drift = subsecond
                 # self.collection.datetime = datetime.datetime.today().strftime(self.config.datetime_format)
-                # #"%d/%m  %H:%M:%S")
                 self.collection.datetime = datetime.datetime.today().strftime("%d/%m  %H:%M:%S")
             # print(f'{secs_since_rotation_start:.1f}, Screen:{current_screen}, timeCount:{time_count},
             # SSS:{secs_since_switch:.1f}, SUS:{secs_until_switch:.1f}, B:{self.collection.brightness:.1f})
@@ -157,7 +152,7 @@ def read_icon(cwd: CurrentWeatherData):
     #    print(f'Loading icon {cwd.icon}.bmp')
     try:
         cwd.weather_icon = Image.open(f'{cwd.icon}.bmp').convert('RGB')
-    except:
+    except Exception as e:
         print(f'Icon {cwd.icon} not found')
         cwd.weather_icon = Image.open('unknown.bmp').convert('RGB')
 
@@ -254,9 +249,9 @@ class IndoorEnvironmentFetcherThread(Thread):
                     print(f"gesture available")
                     motion = apds.readGesture()
                     print(f"gesture code {motion}")
-                    if (motion == APDS9960_DIR_UP):
+                    if motion == APDS9960_DIR_UP:
                         new_env_data.time_offset += 15
-                    elif (motion == APDS9960_DIR_DOWN):
+                    elif motion == APDS9960_DIR_DOWN:
                         new_env_data.time_offset -= 15
             except Exception as e:
                 print(f'Failed to fetch brightness {str(e)}')
@@ -344,7 +339,7 @@ class LedDisplayThread(Thread):
         black = graphics.Color(0, 0, 0)
         red = graphics.Color(128, 0, 0)
         purple = graphics.Color(28, 65, 84)
-        lightBlue = graphics.Color(0, 0, 128)
+        light_blue = graphics.Color(0, 0, 128)
         dark_blue = graphics.Color(0, 0, 32)
         green = graphics.Color(0, 128, 0)
         orange = graphics.Color(128, 75, 0)
@@ -402,17 +397,19 @@ class LedDisplayThread(Thread):
                     graphics.DrawText(offscreen_canvas, font2, 0, 23, green, f'{outdoor.humidity} %')
                     offscreen_canvas.SetImage(outdoor.weather_icon, 45, 7)
 
-                    #                detail1_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text1.pos, 25, green, outdoor.detail_text1.text)
-                    #                outdoor.detail_text1.scroll(detail1_length)
+                    # detail1_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text1.pos, 25, green, outdoor.detail_text1.text)
+                    # outdoor.detail_text1.scroll(detail1_length)
                     detail2_length = graphics.DrawText(offscreen_canvas, font2, outdoor.detail_text2.pos, 31, green,
                                                        outdoor.detail_text2.text)
                     outdoor.detail_text2.scroll(detail2_length)
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
                     time.sleep(0.03)
 
-                #                elif (self.collection.screen in [SCREEN_FORECAST_1, SCREEN_FORECAST_2, SCREEN_FORECAST_3]):
+                # elif (self.collection.screen in [SCREEN_FORECAST_1, SCREEN_FORECAST_2, SCREEN_FORECAST_3]):
                 elif (
-                        self.collection.screen == SCREEN_FORECAST_1 or self.collection.screen == SCREEN_FORECAST_2 or self.collection.screen == SCREEN_FORECAST_3):
+                        self.collection.screen == SCREEN_FORECAST_1
+                        or self.collection.screen == SCREEN_FORECAST_2
+                        or self.collection.screen == SCREEN_FORECAST_3):
                     offset = 0
                     if self.collection.screen == SCREEN_FORECAST_2:
                         offset = 4
@@ -424,7 +421,7 @@ class LedDisplayThread(Thread):
 
                     graphics.DrawText(offscreen_canvas, font, 0, 11, green,
                                       f'{self.collection.forecast_list[offset].timestr} {self.collection.forecast_list[offset].temp}C')
-                    #                graphics.DrawText(offscreen_canvas, font, 0, 17, green, f'{self.collection.forecast_list[offset].weather_desc}')
+                    # graphics.DrawText(offscreen_canvas, font, 0, 17, green, f'{self.collection.forecast_list[offset].weather_desc}')
                     detail_length1 = graphics.DrawText(offscreen_canvas, font,
                                                        self.collection.forecast_list[offset].detail_text.pos, 17, green,
                                                        f'{self.collection.forecast_list[offset].detail_text.text}')
@@ -432,7 +429,7 @@ class LedDisplayThread(Thread):
                     graphics.DrawLine(offscreen_canvas, 0, 18, 63, 18, dark_blue)
                     graphics.DrawText(offscreen_canvas, font, 0, 25, green,
                                       f'{self.collection.forecast_list[offset + 2].timestr} {self.collection.forecast_list[offset + 2].temp}C')
-                    #                graphics.DrawText(offscreen_canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
+                    # graphics.DrawText(offscreen_canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
                     detail_length2 = graphics.DrawText(offscreen_canvas, font,
                                                        self.collection.forecast_list[offset + 2].detail_text.pos, 31,
                                                        green,
