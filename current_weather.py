@@ -1,6 +1,8 @@
+import logging
 import requests
 from dto import *
 from PIL import Image
+
 
 class CurrentWeatherFetcher:
 
@@ -8,7 +10,7 @@ class CurrentWeatherFetcher:
         self.collection = collection
         self.OWM_str = f'http://api.openweathermap.org/data/2.5/weather?id={config1.city_id}&appid={config1.api_key}'
         self.logger = logging.getLogger(__name__)
-        
+
     def run(self):
         self.logger.info("Fetching current weather")
         new_weather_data = CurrentWeatherData()
@@ -50,17 +52,18 @@ class CurrentWeatherFetcher:
                 raise Exception("Current weather not found")
         except Exception as e:
             self.logger.error('Fetching current weather failed: %s', str(e))
-            raise e
+            raise
         self.read_icon(new_weather_data)
         self.collection.current_weather_data = new_weather_data
 
-    def to_float_str(self, inputstr):
+    @staticmethod
+    def to_float_str(inputstr):
         return str(round(float(inputstr), 1))
 
     def read_icon(self, cwd: CurrentWeatherData):
-    # print(f'Loading icon {cwd.icon}.bmp')
+        # print(f'Loading icon {cwd.icon}.bmp')
         try:
             cwd.weather_icon = Image.open(f'{cwd.icon}.bmp').convert('RGB')
-        except:
+        except IOError:
             self.logger.error('Icon %s not found', {cwd.icon})
             cwd.weather_icon = Image.open('unknown.bmp').convert('RGB')

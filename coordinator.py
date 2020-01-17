@@ -1,14 +1,15 @@
-from dto import *
-from threading import Thread, Event
-from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
+import logging
+import time
+from threading import Thread
 from apscheduler.schedulers.background import BackgroundScheduler
+from dto import *
+
 
 class Coordinator(Thread):
     FADE_SECONDS = 2
 
-    def __init__(self, event, collection: DataCollection, config: Config, scheduler: BackgroundScheduler):
+    def __init__(self, collection: DataCollection, config: Config, scheduler: BackgroundScheduler):
         Thread.__init__(self)
-        self.stopped = event
         self.collection = collection
         self.config = config
         self.scheduler = scheduler
@@ -19,7 +20,7 @@ class Coordinator(Thread):
         start_time = time.perf_counter()
         drift = 0
 
-        while not self.stopped.wait(0):
+        while True:
             pc = time.perf_counter() + self.collection.indoor_environment_data.time_offset
             secs_since_start = pc - start_time
             secs_since_rotation_start = secs_since_start % self.layout.total_rotation_secs
@@ -74,7 +75,7 @@ class Coordinator(Thread):
             # print(f'time_period {str(tp)} matches: {mmatch and hmatch and wdmatch and dmatch and momatch}')
             if mmatch and hmatch and wdmatch and dmatch and momatch:
                 if self.layout != tp:
-#                    print(f'switching layout from {self.layout.layout} to {tp.layout}')
+                    #                    print(f'switching layout from {self.layout.layout} to {tp.layout}')
                     self.logger.info('switching layout from %s to %s', self.layout.layout, tp.layout)
                     self.check_pause_resume_job(self.layout.has_trains(), tp.has_trains(), TDF_JOB_ID)
                     self.check_pause_resume_job(self.layout.has_forecast(), tp.has_forecast(), WFF_JOB_ID)

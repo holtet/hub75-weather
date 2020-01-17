@@ -1,12 +1,14 @@
-from threading import Thread, Event
+import logging
+import time
+from threading import Thread
 from PIL import Image
 from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
 from dto import *
 
+
 class LedDisplayThread(Thread):
-    def __init__(self, event, collection: DataCollection):
+    def __init__(self, collection: DataCollection):
         Thread.__init__(self)
-        self.stopped = event
         self.collection = collection
         self.logger = logging.getLogger(__name__)
 
@@ -137,4 +139,3 @@ class LedDisplayThread(Thread):
             except Exception as e:
                 self.logger.error('Failed to show display: %s', str(e))
                 time.sleep(3)
-

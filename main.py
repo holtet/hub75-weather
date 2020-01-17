@@ -1,19 +1,5 @@
 import logging
-import bme280
-import smbus2
-import time
-import datetime
-from os import wait
-from threading import Thread, Event
-#import requests
-#import json
-#import aiohttp
-#import asyncio
-#from enturclient import EnturPublicTransportData
-#from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
-#from PIL import Image
-#from apds9960.const import *
-#from apds9960 import APDS9960
+from threading import Event
 from dto import *
 from coordinator import Coordinator
 from entur import TrainDepartureFetcher
@@ -21,31 +7,13 @@ from current_weather import CurrentWeatherFetcher
 from weather_forecast import WeatherForecastFetcher
 from indoor_environment import IndoorEnvironmentFetcher
 from led_display import LedDisplayThread
+from listener import Listener
 from const import *
 import configparser
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from apscheduler.schedulers.background import BackgroundScheduler
 
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s %(message)s', level=logging.WARNING)
-
-
-class Listener:
-    def __init__(self, joblist1):
-        self.joblist = joblist1
-        self.logger = logging.getLogger("Listener") # __name__
-
-    def job_done_listener(self, event):
-        job = joblist[event.job_id]
-        if event.exception:
-            self.logger.info('The job %s crashed', {event.job_id})
-            if job.last_success:
-                job.job.reschedule(trigger='interval', seconds=job.interval_error)
-                job.last_success = False
-        else:
-            self.logger.info('The job %s was successful', {event.job_id})
-            if not job.last_success:
-                job.job.reschedule(trigger='interval', seconds=job.interval_ok)
-                job.last_success = True
 
 
 # Main function
@@ -89,11 +57,8 @@ if __name__ == "__main__":
 
     stopFlag = Event()
 
-#    thread3 = IndoorEnvironmentFetcherThread(stopFlag, dataCollection)
-#    thread3.start()
-
-    thread4 = Coordinator(stopFlag, dataCollection, config, scheduler)
+    thread4 = Coordinator(dataCollection, config, scheduler)
     thread4.start()
 
-    run_text = LedDisplayThread(stopFlag, dataCollection)
+    run_text = LedDisplayThread(dataCollection)
     run_text.start()

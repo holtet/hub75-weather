@@ -1,10 +1,8 @@
-import requests
-import json
+import logging
 import aiohttp
 import asyncio
 from enturclient import EnturPublicTransportData
 from dto import *
-from const import *
 
 
 class TrainDepartureFetcher:

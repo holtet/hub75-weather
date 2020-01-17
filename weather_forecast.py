@@ -1,27 +1,25 @@
-from dto import *
+import logging
 import requests
 from datetime import datetime
+from dto import *
+
 
 class WeatherForecastFetcher:
 
     def __init__(self, collection: DataCollection, config1: Config):
         self.collection = collection
         self.OWM_str = f'http://api.openweathermap.org/data/2.5/forecast?id={config1.city_id}&appid={config1.api_key}'
-        self.logger = logging.getLogger("WeatherForecastFetcher") # __name__
-
-#    @staticmethod
-#    def to_float_str(inputstr):
-#        return str(round(float(inputstr), 1))
+        self.logger = logging.getLogger(__name__)
 
     def run(self):
         try:
             self.logger.info("Fetching weather forecast")
-            response = requests.get(self.OWM_str)  # .json
+            response = requests.get(self.OWM_str).json
             # print(response.content)
-            response2 = response.json()
-            if response2['cod'] != '404':
+            # response2 = response.json()
+            if response['cod'] != '404':
                 self.collection.forecast_list = []
-                forecasts = response2['list']
+                forecasts = response['list']
                 for forecast in forecasts:
                     fore = Forecast()
                     dt = datetime.fromtimestamp(forecast['dt'])
@@ -43,4 +41,3 @@ class WeatherForecastFetcher:
         except Exception as e:
             self.logger.error('Weather forecast fetcher failed: %s', str(e))
             raise e
-

@@ -1,9 +1,11 @@
-from dto import *
-from const import *
+import logging
+import time
 import bme280
 import smbus2
 from apds9960.const import *
 from apds9960 import APDS9960
+from dto import *
+
 
 class IndoorEnvironmentFetcher:
     PORT = 1  # i2c port
@@ -51,4 +53,3 @@ class IndoorEnvironmentFetcher:
             except Exception as e:
                 self.logger.error('Failed to fetch brightness: %s', str(e))
                 raise Exception('Failed to fetch brightness')
-#            time.sleep(2)
