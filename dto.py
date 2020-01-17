@@ -5,6 +5,11 @@ import functools
 import operator
 from const import *
 
+class NewsItem:
+    def __init__(self, text):
+        self.text = text
+
+        
 class Job:
     def __init__(self, job, interval_ok, interval_error):
         self.job = job
@@ -213,7 +218,10 @@ class DataCollection():
         self.indoor_environment_data = IndoorEnvironmentData()
         self.current_weather_data = CurrentWeatherData()
         self.departure_list = []
+        self.news_list  = []
         for i in range(0, 5):
             self.departure_list.append(Departure("", datetime.time(0, 0, 0), 0, 64))
+            self.news_list.append(NewsItem(""))
         self.ambient_light = 100
         self.forecast_list = []
+            
