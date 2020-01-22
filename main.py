@@ -1,11 +1,13 @@
 import logging
 from threading import Event
 from dto import *
+from config import Config
 from coordinator import Coordinator
 from entur import TrainDepartureFetcher
 from current_weather import CurrentWeatherFetcher
 from weather_forecast import WeatherForecastFetcher
 from indoor_environment import IndoorEnvironmentFetcher
+from news import NewsFetcher
 from led_display import LedDisplayThread
 from listener import Listener
 from const import *
@@ -51,14 +53,19 @@ if __name__ == "__main__":
     ief_job = scheduler.add_job(ief.run, trigger='interval', seconds=2, id=IEF_JOB_ID)
     joblist[IEF_JOB_ID] = Job(ief_job, 2, 2)
 
+    nf = NewsFetcher(dataCollection, config)
+    nf.run()
+    nf_job = scheduler.add_job(nf.run, trigger='interval', seconds=3600, id=NF_JOB_ID)
+    joblist[NF_JOB_ID] = Job(nf_job, 3600, 600)
+
     scheduler.add_listener(Listener(joblist).job_done_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
 
     scheduler.start()
 
-    stopFlag = Event()
+#    stopFlag = Event()
 
-    thread4 = Coordinator(dataCollection, config, scheduler)
-    thread4.start()
+    cthread = Coordinator(dataCollection, config, scheduler)
+    cthread.start()
 
-    run_text = LedDisplayThread(dataCollection)
-    run_text.start()
+    lthread = LedDisplayThread(dataCollection)
+    lthread.start()

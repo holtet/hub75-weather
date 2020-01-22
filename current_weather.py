@@ -1,7 +1,8 @@
 import logging
 import requests
-from dto import *
 from PIL import Image
+from dto import *
+from config import Config
 
 
 class CurrentWeatherFetcher:

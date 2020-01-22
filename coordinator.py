@@ -3,7 +3,7 @@ import time
 from threading import Thread
 from apscheduler.schedulers.background import BackgroundScheduler
 from dto import *
-
+from config import Config
 
 class Coordinator(Thread):
     FADE_SECONDS = 2
@@ -13,7 +13,7 @@ class Coordinator(Thread):
         self.collection = collection
         self.config = config
         self.scheduler = scheduler
-        self.layout = TimePeriod("Default", [5, 5, 5, 5, 5, 5])
+        self.layout = TimePeriod("Default", [5, 5, 5, 5, 5, 5, 5])
         self.logger = logging.getLogger(__name__)
 
     def run(self):
@@ -49,9 +49,9 @@ class Coordinator(Thread):
             # On the "exact" second
             if subsecond < 0.1:
                 drift = subsecond
-                # self.collection.datetime = datetime.datetime.today().strftime(self.config.datetime_format)
+                self.collection.datetime = datetime.datetime.today().strftime(self.config.datetime_format)
                 # #"%d/%m  %H:%M:%S")
-                self.collection.datetime = datetime.datetime.today().strftime("%d/%m  %H:%M:%S")
+                #self.collection.datetime = datetime.datetime.today().strftime("%d/%m  %H:%M:%S")
             # print(f'{secs_since_rotation_start:.1f}, Screen:{current_screen}, timeCount:{time_count},
             # SSS:{secs_since_switch:.1f}, SUS:{secs_until_switch:.1f}, B:{self.collection.brightness:.1f})
             # On the "exact" half-second right before starting a new round through screens
@@ -75,18 +75,18 @@ class Coordinator(Thread):
             # print(f'time_period {str(tp)} matches: {mmatch and hmatch and wdmatch and dmatch and momatch}')
             if mmatch and hmatch and wdmatch and dmatch and momatch:
                 if self.layout != tp:
-                    #                    print(f'switching layout from {self.layout.layout} to {tp.layout}')
-                    self.logger.info('switching layout from %s to %s', self.layout.layout, tp.layout)
+                    self.logger.warning('switching layout from %s to %s', self.layout.layout, tp.layout)
                     self.check_pause_resume_job(self.layout.has_trains(), tp.has_trains(), TDF_JOB_ID)
                     self.check_pause_resume_job(self.layout.has_forecast(), tp.has_forecast(), WFF_JOB_ID)
                     self.check_pause_resume_job(self.layout.has_outdoor(), tp.has_outdoor(), CWF_JOB_ID)
+                    self.check_pause_resume_job(self.layout.has_news(), tp.has_news(), NF_JOB_ID)
                     self.layout = tp
                     return
 
     def check_pause_resume_job(self, old, new, job_id):
         if old and not new:
-            self.logger.info('Pausing %s', {job_id})
+            self.logger.warning('Pausing %s', {job_id})
             self.scheduler.pause_job(job_id)
         elif new and not old:
-            self.logger.info(f'Resuming %s', {job_id})
+            self.logger.warning(f'Resuming %s', {job_id})
             self.scheduler.resume_job(job_id)

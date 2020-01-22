@@ -3,7 +3,7 @@ import aiohttp
 import asyncio
 from enturclient import EnturPublicTransportData
 from dto import *
-
+from config import Config
 
 class TrainDepartureFetcher:
 

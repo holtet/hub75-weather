@@ -2,6 +2,7 @@ import logging
 import requests
 from datetime import datetime
 from dto import *
+from config import Config
 
 
 class WeatherForecastFetcher:
@@ -14,7 +15,7 @@ class WeatherForecastFetcher:
     def run(self):
         try:
             self.logger.info("Fetching weather forecast")
-            response = requests.get(self.OWM_str).json
+            response = requests.get(self.OWM_str).json()
             # print(response.content)
             # response2 = response.json()
             if response['cod'] != '404':
@@ -22,7 +23,7 @@ class WeatherForecastFetcher:
                 forecasts = response['list']
                 for forecast in forecasts:
                     fore = Forecast()
-                    dt = datetime.fromtimestamp(forecast['dt'])
+                    dt = datetime.datetime.fromtimestamp(forecast['dt'])
                     fore.weekday = dt.strftime('%a %d/%m')
                     fore.timestr = dt.strftime('%H:%M')
                     main = forecast['main']

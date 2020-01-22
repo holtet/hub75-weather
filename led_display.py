@@ -68,9 +68,9 @@ class LedDisplayThread(Thread):
                         dep.display.scroll(text_length)
                         for y in range(y0, y1):
                             graphics.DrawLine(offscreen_canvas, 45, y, 63, y, black)
-                            graphics.DrawLine(offscreen_canvas, 45 - 1, y0, 45 - 1, y1, dark_blue)
-                            graphics.DrawLine(offscreen_canvas, 0, y1, 63, y1, dark_blue)
-                            graphics.DrawText(offscreen_canvas, font, 45, y1, dep_color, dep.text2())
+                        graphics.DrawLine(offscreen_canvas, 45 - 1, y0, 45 - 1, y1, dark_blue)
+                        graphics.DrawLine(offscreen_canvas, 0, y1, 63, y1, dark_blue)
+                        graphics.DrawText(offscreen_canvas, font, 45, y1, dep_color, dep.text2())
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
                     time.sleep(0.03)
                 elif self.collection.screen == SCREEN_INDOOR:
@@ -134,6 +134,20 @@ class LedDisplayThread(Thread):
                                                        green,
                                                        f'{self.collection.forecast_list[offset + 2].detail_text.text}')
                     self.collection.forecast_list[offset + 2].detail_text.scroll(detail_length2)
+                    offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
+                    time.sleep(0.03)
+                elif self.collection.screen == SCREEN_NEWS:
+#                    graphics.DrawLine(offscreen_canvas, 0, 1, 63, 1, dark_blue)
+
+                    for index, dep in enumerate(self.collection.news_list, start=0):
+#                        if dep.delay < 1:
+                        dep_color = green
+
+                        y0 = index * 6 + 2
+                        y1 = y0 + 5
+                        text_length = graphics.DrawText(offscreen_canvas, font, dep.text.pos, y1, dep_color,
+                                                        dep.text.text)
+                        dep.text.scroll(text_length)
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
                     time.sleep(0.03)
             except Exception as e:
