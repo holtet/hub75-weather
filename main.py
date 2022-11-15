@@ -54,7 +54,10 @@ if __name__ == "__main__":
     joblist[IEF_JOB_ID] = Job(ief_job, 2, 2)
 
     nf = NewsFetcher(dataCollection, config)
-    nf.run()
+    try:
+        nf.run()
+    except Exception as e:
+        print("Failed to fetch news")
     nf_job = scheduler.add_job(nf.run, trigger='interval', seconds=3600, id=NF_JOB_ID)
     joblist[NF_JOB_ID] = Job(nf_job, 3600, 600)
 

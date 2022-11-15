@@ -1,6 +1,8 @@
 import twitter
 import feedparser
 from dto import *
+from config import Config
+
 
 class NewsFetcher:
 
@@ -13,7 +15,8 @@ class NewsFetcher:
         try:
             print("Fetching news")
 #            NewsFeed = feedparser.parse("https://www.nrk.no/toppsaker.rss")
-            newsFeed = feedparser.parse("https://www.nrk.no/osloogviken/toppsaker.rss")
+#            newsFeed = feedparser.parse("https://www.nrk.no/osloogviken/toppsaker.rss")
+            newsFeed = feedparser.parse("https://www.vg.no/rss/feed/?categories=1069%2C1070&limit=10&format=rss&private=1")
 
             for index, entry in enumerate(newsFeed.entries[:5]):
 #                print(str(entry))

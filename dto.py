@@ -30,7 +30,8 @@ class TimePeriod:
         self.days = None
         self.months = None
         self.max_screen = len(times)
-        self.max_active_screen = len(list(filter(lambda x: x > 0, times))) - 1
+        self.max_active_screen = next(filter(lambda b:b[1]>0, reversed(list(enumerate(times)))), (0,0))[0]
+#        self.max_active_screen = len(list(filter(lambda x: x > 0, times))) - 1
         self.total_rotation_secs = functools.reduce(operator.add, times)
 
     def has_trains(self):
@@ -76,7 +77,7 @@ class Forecast:
         if self.rain_3h > 0.0:
             rain_text = f'Rain 3h: {self.rain_3h}mm '
         self.detail_text = ScrollText(
-            f'{self.weather_desc}  {snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0, 64, 64)
+            f'{self.weather_desc}, {snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0, 64, 64)
 
 
 class ScrollText:
@@ -178,8 +179,8 @@ class CurrentWeatherData:
         elif self.rain_3h > 0.0:
             rain_text = f'Rain 3h: {self.rain_3h}mm '
         self.detail_text2 = ScrollText(
-            f'{self.pressure} hPa  {snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0, 64, 64)
-        # TODO: Farge avh av vær
+            f'{self.weather_description} {snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0, 64, 64)
+        # {self.pressure} hPa  TODO: Farge avh av vær
 
 
 class DataCollection:

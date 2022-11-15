@@ -54,6 +54,7 @@ class Coordinator(Thread):
                 #self.collection.datetime = datetime.datetime.today().strftime("%d/%m  %H:%M:%S")
             # print(f'{secs_since_rotation_start:.1f}, Screen:{current_screen}, timeCount:{time_count},
             # SSS:{secs_since_switch:.1f}, SUS:{secs_until_switch:.1f}, B:{self.collection.brightness:.1f})
+
             # On the "exact" half-second right before starting a new round through screens
             if (
                     0 < subsecond_half < 0.01
@@ -66,6 +67,7 @@ class Coordinator(Thread):
         t = datetime.datetime.today()
         # print(f'current_screen {current_screen} max {layout.max_active_screen}')
         # print(f'min {t.minute} hour {t.hour} weekday {t.weekday()+1} day {t.day} month {t.month}')
+        self.logger.warning('Current layout: %s', self.layout.layout)
         for tp in self.config.time_periods:
             mmatch = tp.minutes is None or tp.minutes.__contains__(t.minute)
             hmatch = tp.hours is None or tp.hours.__contains__(t.hour)
