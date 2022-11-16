@@ -9,7 +9,7 @@ class CurrentWeatherFetcher:
 
     def __init__(self, collection: DataCollection, config1: Config):
         self.collection = collection
-        self.OWM_str = f'http://api.openweathermap.org/data/2.5/weather?id={config1.city_id}&appid={config1.api_key}'
+        self.OWM_str = f'http://api.openweathermap.org/data/2.5/weather?id={config1.weather_city_id}&appid={config1.weather_api_key}'
         self.logger = logging.getLogger(__name__)
 
     def run(self):

@@ -1,15 +1,15 @@
 import logging
 import requests
 from datetime import datetime
-from dto import *
-from config import Config
 
+from config import Config
+from dto import *
 
 class WeatherForecastFetcher:
 
     def __init__(self, collection: DataCollection, config1: Config):
         self.collection = collection
-        self.OWM_str = f'http://api.openweathermap.org/data/2.5/forecast?id={config1.city_id}&appid={config1.api_key}'
+        self.OWM_str = f'http://api.openweathermap.org/data/2.5/forecast?id={config1.weather_city_id}&appid={config1.weather_api_key}'
         self.logger = logging.getLogger(__name__)
 
     def run(self):
@@ -25,7 +25,7 @@ class WeatherForecastFetcher:
                     fore = Forecast()
                     dt = datetime.datetime.fromtimestamp(forecast['dt'])
                     fore.weekday = dt.strftime('%a %d/%m')
-                    fore.timestr = dt.strftime('%H:%M')
+                    fore.time = dt.strftime('%H:%M')
                     main = forecast['main']
                     fore.temp = str(round(float(main['temp']) - 273.15, 1))
                     fore.weather_desc = forecast['weather'][0]['description']

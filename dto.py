@@ -1,9 +1,8 @@
 import datetime
-#import re
 import functools
 import operator
-from const import *
 
+from const import *
 
 class NewsItem:
     def __init__(self, text):
@@ -28,8 +27,8 @@ class TimePeriod:
         self.days = None
         self.months = None
         self.max_screen = len(times)
-        self.max_active_screen = next(filter(lambda b:b[1]>0, reversed(list(enumerate(times)))), (0,0))[0]
-#        self.max_active_screen = len(list(filter(lambda x: x > 0, times))) - 1
+        self.max_active_screen = next(filter(lambda b: b[1] > 0, reversed(list(enumerate(times)))), (0, 0))[0]
+        #        self.max_active_screen = len(list(filter(lambda x: x > 0, times))) - 1
         self.total_rotation_secs = functools.reduce(operator.add, times)
 
     def has_trains(self):
@@ -52,7 +51,7 @@ class TimePeriod:
 class Forecast:
     def __init__(self):  # , weekday, timestr, temp, weather_desc):
         self.weekday = ''  # weekday
-        self.timestr = ''  # timestr
+        self.time = ''  # timestr
         self.temp = ''  # temp
         self.weather_desc = ''  # weather_desc
         self.detail_text = ScrollText('', 0, 0, 0)
@@ -75,7 +74,8 @@ class Forecast:
         if self.rain_3h > 0.0:
             rain_text = f'Rain 3h: {self.rain_3h}mm '
         self.detail_text = ScrollText(
-            f'{self.weather_desc}, {snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0, 128, 30)
+            f'{self.weather_desc}, {snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0, 128,
+            30)
 
 
 class ScrollText:
@@ -91,28 +91,28 @@ class ScrollText:
             self.pos = self.right
 
 
-class Departure2:
-    def __init__(self, display, time, delay, pos):
-        self.display = display
-        self.time = time.strftime("%H:%M")
-        self.delay = delay
-        self.pos = pos
-
-    def text1(self):
-        #        print(f'{self.display} Pos {self.pos}')
-        self.pos -= 1
-        if self.delay == 0:
-            return f'{self.display}'
-        else:
-            return f'{self.display}  ({str(self.delay)}m)'
-
-    def text2(self):
-        return f'{self.time}'
+# class Departure2:
+#     def __init__(self, display, time, delay, pos):
+#         self.display = display
+#         self.time = time.strftime("%H:%M")
+#         self.delay = delay
+#         self.pos = pos
+#
+#     def text1(self):
+#         #        print(f'{self.display} Pos {self.pos}')
+#         self.pos -= 1
+#         if self.delay == 0:
+#             return f'{self.display}'
+#         else:
+#             return f'{self.display}  ({str(self.delay)}m)'
+#
+#     def text2(self):
+#         return f'{self.time}'
 
 
 class Departure:
     def __init__(self, display, time, delay, pos):
-        self.display = ScrollText(display, 0, 45+64, pos)
+        self.display = ScrollText(display, 0, 45 + 64, pos)
         if isinstance(time, str):
             self.time = time
         else:
@@ -120,7 +120,7 @@ class Departure:
         self.delay = delay
         self.pos = pos
 
-    def text1(self):
+    def train_name(self):
         #        print(f'{self.display.text} Pos {self.display.pos}')
         #        self.pos -= 1
         if self.delay == 0:
@@ -128,7 +128,7 @@ class Departure:
         else:
             return f'{self.display.text}  ({str(self.delay)}m)'
 
-    def text2(self):
+    def departure_time(self):
         return f'{self.time}'
 
 
@@ -177,7 +177,8 @@ class CurrentWeatherData:
         elif self.rain_3h > 0.0:
             rain_text = f'Rain 3h: {self.rain_3h}mm '
         self.detail_text2 = ScrollText(
-            f'{self.weather_description} {snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0, 128, 128)
+            f'{self.weather_description} {snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0,
+            128, 128)
         # {self.pressure} hPa  TODO: Farge avh av vær
 
 

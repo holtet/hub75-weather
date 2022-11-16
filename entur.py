@@ -1,9 +1,11 @@
-import logging
 import aiohttp
 import asyncio
+import logging
 from enturclient import EnturPublicTransportData
-from dto import *
+
 from config import Config
+from dto import *
+
 
 class TrainDepartureFetcher:
 
@@ -30,7 +32,7 @@ class TrainDepartureFetcher:
                 client_name=self.config.entur_client_id,
                 stops=stops,
                 omit_non_boarding=True,
-                number_of_departures=10,
+                number_of_departures=self.config.max_train_departures + 5,
                 web_session=client)
             await data.update()
 
@@ -40,14 +42,13 @@ class TrainDepartureFetcher:
                 #                print(f'|{call.front_display}|')
                 #                for d in self.destinations:
                 #                    print(f'destination: |{d}|')
-                if dindex < 5 and call.front_display in self.config.destinations:  # or (1 == 1):
+                if dindex < self.config.max_train_departures and call.front_display in self.config.destinations:  # or (1 == 1):
                     old_pos = self.collection.departure_list[dindex].pos
                     departure = Departure(call.front_display, call.aimed_departure_time, call.delay_in_min, old_pos)
                     self.collection.departure_list[dindex] = departure
                     dindex += 1
             #                else:
             #                    print(f'Skipped train departure |{call.front_display}|, dindex {dindex}')
-            while dindex < 5:
+            while dindex < self.config.max_train_departures:
                 self.collection.departure_list[dindex] = Departure("", "", 0, 0)
                 dindex += 1
-

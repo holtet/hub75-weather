@@ -1,11 +1,10 @@
-import logging
 import time
 import bme280
+import logging
 import smbus2
-from apds9960.const import *
 from apds9960 import APDS9960
-from dto import *
 
+from dto import *
 
 class IndoorEnvironmentFetcher:
     PORT = 1  # i2c port
@@ -41,15 +40,14 @@ class IndoorEnvironmentFetcher:
                 raise Exception('Failed to fetch indoor environment')
             try:
                 self.collection.ambient_light = self.apds.readAmbientLight()
-                if False:
-                    #                if apds.isGestureAvailable():
-                    print(f"gesture available")
-                    motion = self.apds.readGesture()
-                    print(f"gesture code {motion}")
-                    if (motion == APDS9960_DIR_UP):
-                        new_env_data.time_offset += 15
-                    elif (motion == APDS9960_DIR_DOWN):
-                        new_env_data.time_offset -= 15
+                #                if apds.isGestureAvailable():
+                # print(f"gesture available")
+                # motion = self.apds.readGesture()
+                # print(f"gesture code {motion}")
+                # if (motion == APDS9960_DIR_UP):
+                #     new_env_data.time_offset += 15
+                # elif (motion == APDS9960_DIR_DOWN):
+                #     new_env_data.time_offset -= 15
             except Exception as e:
                 self.logger.error('Failed to fetch brightness: %s', str(e))
                 raise Exception('Failed to fetch brightness')
