@@ -18,7 +18,7 @@ class NewsFetcher:
 #            newsFeed = feedparser.parse("https://www.nrk.no/osloogviken/toppsaker.rss")
             newsFeed = feedparser.parse("https://www.vg.no/rss/feed/?categories=1069%2C1070&limit=10&format=rss&private=1")
 
-            for index, entry in enumerate(newsFeed.entries[:5]):
+            for index, entry in enumerate(newsFeed.entries[:8]):
 #                print(str(entry))
                 self.collection.news_list[index] = NewsItem(f'{entry.title} - {entry.summary}')             
 #                self.collection.news_list[index] = NewsItem(f'{entry.summary}')             

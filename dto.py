@@ -7,7 +7,7 @@ from const import *
 
 class NewsItem:
     def __init__(self, text):
-        self.text = ScrollText(text, 0, 64, 64)
+        self.text = ScrollText(text, 0, 128, 128)
 
 
 class Job:
@@ -16,8 +16,6 @@ class Job:
         self.last_success = True
         self.interval_ok = interval_ok
         self.interval_error = interval_error
-
-
 
 
 class TimePeriod:
@@ -77,7 +75,7 @@ class Forecast:
         if self.rain_3h > 0.0:
             rain_text = f'Rain 3h: {self.rain_3h}mm '
         self.detail_text = ScrollText(
-            f'{self.weather_desc}, {snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0, 64, 64)
+            f'{self.weather_desc}, {snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0, 128, 30)
 
 
 class ScrollText:
@@ -114,7 +112,7 @@ class Departure2:
 
 class Departure:
     def __init__(self, display, time, delay, pos):
-        self.display = ScrollText(display, 0, 45, pos)
+        self.display = ScrollText(display, 0, 45+64, pos)
         if isinstance(time, str):
             self.time = time
         else:
@@ -163,10 +161,10 @@ class CurrentWeatherData:
         self.snow_3h = 0.0
 
     def set_header_text(self):
-        self.header_text = ScrollText(f'{self.city}: {self.weather_description}', 0, 64, 64)
+        self.header_text = ScrollText(f'{self.city}: {self.weather_description}', 0, 128, 128)
 
     def set_detail_text1(self):
-        self.detail_text1 = ScrollText(f'Wind: {self.wind_speed}m/s  Cloud%: {self.clouds}', 0, 64, 64)
+        self.detail_text1 = ScrollText(f'Wind: {self.wind_speed}m/s  Cloud%: {self.clouds}', 0, 128, 128)
 
     def set_detail_text2(self):
         rain_text = ""
@@ -179,7 +177,7 @@ class CurrentWeatherData:
         elif self.rain_3h > 0.0:
             rain_text = f'Rain 3h: {self.rain_3h}mm '
         self.detail_text2 = ScrollText(
-            f'{self.weather_description} {snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0, 64, 64)
+            f'{self.weather_description} {snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0, 128, 128)
         # {self.pressure} hPa  TODO: Farge avh av vær
 
 
@@ -193,8 +191,8 @@ class DataCollection:
         self.current_weather_data = CurrentWeatherData()
         self.departure_list = []
         self.news_list = []
-        for i in range(0, 5):
-            self.departure_list.append(Departure("", datetime.time(0, 0, 0), 0, 64))
+        for i in range(0, 8):
+            self.departure_list.append(Departure("", datetime.time(0, 0, 0), 0, 128))
             self.news_list.append(NewsItem(""))
         self.ambient_light = 100
         self.forecast_list = []

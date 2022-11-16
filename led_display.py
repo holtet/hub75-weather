@@ -14,13 +14,16 @@ class LedDisplayThread(Thread):
 
     def run(self):
         self.logger.info("Starting display thread")
+        height = 64
+        width = 128
         options = RGBMatrixOptions()
-        options.rows = 32
-        options.cols = 64
+        options.rows = height
+        options.cols = width
+        options.row_address_type = 3
         options.chain_length = 1
         options.parallel = 1
         options.hardware_mapping = 'regular'  # If you have an Adafruit HAT: 'adafruit-hat'
-        options.gpio_slowdown = 2
+        options.gpio_slowdown = 1
         options.pwm_lsb_nanoseconds = 60
         options.pwm_bits = 11
         matrix = RGBMatrix(options=options)
@@ -38,7 +41,7 @@ class LedDisplayThread(Thread):
         font4 = graphics.Font()
         font4.LoadFont("rpi-rgb-led-matrix/fonts/6x9.bdf")
 
-        home_image = Image.open("blue_house1.bmp").convert('RGB')
+        home_image = Image.open("heart_house.bmp").convert('RGB')
 
         black = graphics.Color(0, 0, 0)
         red = graphics.Color(128, 0, 0)
@@ -55,7 +58,7 @@ class LedDisplayThread(Thread):
                     self.collection.brightness * min(self.collection.ambient_light * 2 + 10, 100)
 
                 if self.collection.screen == SCREEN_TRAINS:
-                    graphics.DrawLine(offscreen_canvas, 0, 1, 63, 1, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 0, 1, width - 1, 1, dark_blue)
 
                     for index, dep in enumerate(self.collection.departure_list, start=0):
                         if dep.delay < 1:
@@ -67,19 +70,21 @@ class LedDisplayThread(Thread):
 
                         y0 = index * 6 + 2
                         y1 = y0 + 5
-                        text_length = graphics.DrawText(offscreen_canvas, font, dep.display.pos, y1, dep_color,
-                                                        dep.text1())
-                        dep.display.scroll(text_length)
+                        text_length = graphics.DrawText(offscreen_canvas, font, 0, y1, dep_color,
+                                                         dep.text1())
+#                        text_length = graphics.DrawText(offscreen_canvas, font, dep.display.pos, y1, dep_color,
+#                                                         dep.text1())
+#                        dep.display.scroll(text_length)
                         for y in range(y0, y1):
-                            graphics.DrawLine(offscreen_canvas, 45, y, 63, y, black)
-                        graphics.DrawLine(offscreen_canvas, 45 - 1, y0, 45 - 1, y1, dark_blue)
-                        graphics.DrawLine(offscreen_canvas, 0, y1, 63, y1, dark_blue)
-                        graphics.DrawText(offscreen_canvas, font, 45, y1, dep_color, dep.text2())
+                            graphics.DrawLine(offscreen_canvas, width-19, y, width-1, y, black)
+                        graphics.DrawLine(offscreen_canvas, width-20, y0, width-20, y1, dark_blue)
+                        graphics.DrawLine(offscreen_canvas, 0, y1, width-1, y1, dark_blue)
+                        graphics.DrawText(offscreen_canvas, font, width-19, y1, dep_color, dep.text2())
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
                     time.sleep(0.03)
 
                 elif self.collection.screen == SCREEN_INDOOR:
-                    graphics.DrawLine(offscreen_canvas, 0, 5, 63, 5, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 0, 5, width - 1, 5, dark_blue)
                     graphics.DrawText(offscreen_canvas, font, 2, 5, red, f'{self.collection.datetime}')
                     indoor = self.collection.indoor_environment_data
                     outdoor = self.collection.current_weather_data
@@ -89,7 +94,7 @@ class LedDisplayThread(Thread):
                     graphics.DrawCircle(offscreen_canvas, temp_text_length - 8, 8, 1, green)
 #                    graphics.DrawText(offscreen_canvas, font2, 1, 32, green, f'{indoor.pressure:.1f} hPa')
 #                    graphics.DrawText(offscreen_canvas, font, 1, 32, green, outdoor.weather_description)
-                    detail2_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text2.pos, 30, green,
+                    detail2_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text2.pos, height - 2, green,
                                                        outdoor.detail_text2.text)
                     outdoor.detail_text2.scroll(detail2_length)
                     offscreen_canvas.SetImage(home_image, 45, 7)
@@ -98,7 +103,7 @@ class LedDisplayThread(Thread):
 
                 elif self.collection.screen == SCREEN_OUTDOOR:
                     outdoor = self.collection.current_weather_data
-                    graphics.DrawLine(offscreen_canvas, 0, 5, 63, 5, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 0, 5, width-1, 5, dark_blue)
                     graphics.DrawText(offscreen_canvas, font, 2, 5, red, f'{self.collection.datetime}')
 #                    header_text_length = graphics.DrawText(offscreen_canvas, font, outdoor.header_text.pos, 5, red,
 #                                                           outdoor.header_text.text)
@@ -111,7 +116,7 @@ class LedDisplayThread(Thread):
 
                     #                detail1_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text1.pos, 25, green, outdoor.detail_text1.text)
                     #                outdoor.detail_text1.scroll(detail1_length)
-                    detail2_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text2.pos, 30, green,
+                    detail2_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text2.pos, height - 2, green,
                                                        outdoor.detail_text2.text)
                     outdoor.detail_text2.scroll(detail2_length)
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
@@ -127,7 +132,7 @@ class LedDisplayThread(Thread):
                         offset = 4
                     elif self.collection.screen == SCREEN_FORECAST_3:
                         offset = 8
-                    graphics.DrawLine(offscreen_canvas, 0, 5, 63, 5, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 0, 5, width-1, 5, dark_blue)
                     graphics.DrawText(offscreen_canvas, font, 0, 5, purple,
                                       f'{self.collection.current_weather_data.city}  {self.collection.forecast_list[offset].weekday}')
 
@@ -138,7 +143,7 @@ class LedDisplayThread(Thread):
                                                        self.collection.forecast_list[offset].detail_text.pos, 17, green,
                                                        f'{self.collection.forecast_list[offset].detail_text.text}')
                     self.collection.forecast_list[offset].detail_text.scroll(detail_length1)
-                    graphics.DrawLine(offscreen_canvas, 0, 18, 63, 18, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 0, 18, width-1, 18, dark_blue)
                     graphics.DrawText(offscreen_canvas, font, 0, 25, green,
                                       f'{self.collection.forecast_list[offset + 2].timestr} {self.collection.forecast_list[offset + 2].temp}C')
                     #                graphics.DrawText(offscreen_canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
