@@ -5,12 +5,14 @@ from PIL import Image
 from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
 from threading import Thread
 
+from config import Config
 from dto import *
 
 
 class LedDisplayThread(Thread):
-    def __init__(self, collection: DataCollection):
+    def __init__(self, collection: DataCollection, config: Config):
         Thread.__init__(self)
+        self.config = config
         self.collection = collection
         self.logger = logging.getLogger(__name__)
 
@@ -60,7 +62,7 @@ class LedDisplayThread(Thread):
                     self.collection.brightness * min(self.collection.ambient_light * 2 + 10, 100)
 
                 if self.collection.screen == SCREEN_TRAINS:
-                    graphics.DrawLine(offscreen_canvas, 0, 1, width - 1, 1, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 0, 1, self.config.zs_width, 1, dark_blue)
 
                     for index, departure in enumerate(self.collection.departure_list, start=0):
                         if departure.delay < 1:
@@ -78,16 +80,16 @@ class LedDisplayThread(Thread):
                         #                                                         news_item.text1())
                         #                        news_item.display.scroll(text_length)
                         for y in range(y0, y1):
-                            graphics.DrawLine(offscreen_canvas, width - 19, y, width - 1, y, black)
+                            graphics.DrawLine(offscreen_canvas, width - 19, y, self.config.zs_width, y, black)
                         graphics.DrawLine(offscreen_canvas, width - 20, y0, width - 20, y1, dark_blue)
-                        graphics.DrawLine(offscreen_canvas, 0, y1, width - 1, y1, dark_blue)
+                        graphics.DrawLine(offscreen_canvas, 0, y1, self.config.zs_width, y1, dark_blue)
                         graphics.DrawText(offscreen_canvas, font_thumb, width - 19, y1, dep_color,
                                           departure.departure_time())
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
                     time.sleep(0.03)
 
                 elif self.collection.screen == SCREEN_INDOOR:
-                    graphics.DrawLine(offscreen_canvas, 0, 5, width - 1, 5, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 0, 5, self.config.zs_width, 5, dark_blue)
                     graphics.DrawText(offscreen_canvas, font_thumb, 2, 5, red, f'{self.collection.datetime}')
                     indoor = self.collection.indoor_environment_data
                     outdoor = self.collection.current_weather_data
@@ -107,7 +109,7 @@ class LedDisplayThread(Thread):
 
                 elif self.collection.screen == SCREEN_OUTDOOR:
                     outdoor = self.collection.current_weather_data
-                    graphics.DrawLine(offscreen_canvas, 0, 5, width - 1, 5, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 0, 5, self.config.zs_width, 5, dark_blue)
                     graphics.DrawText(offscreen_canvas, font_thumb, 2, 5, red, f'{self.collection.datetime}')
                     #                    header_text_length = graphics.DrawText(offscreen_canvas, font, outdoor.header_text.pos, 5, red,
                     #                                                           outdoor.header_text.text)
@@ -121,7 +123,7 @@ class LedDisplayThread(Thread):
                     #                detail1_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text1.pos, 25, green, outdoor.detail_text1.text)
                     #                outdoor.detail_text1.scroll(detail1_length)
                     detail2_length = graphics.DrawText(offscreen_canvas, font_thumb, outdoor.detail_text2.pos,
-                                                       height - 2, green,
+                                                       self.config.height - 2, green,
                                                        outdoor.detail_text2.text)
                     outdoor.detail_text2.scroll(detail2_length)
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
@@ -165,7 +167,7 @@ class LedDisplayThread(Thread):
                     forecast_2.detail_text.scroll(detail_length2)
 
                     # + 9 hour
-                    graphics.DrawLine(offscreen_canvas, 0, 18, width - 1, 32, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 0, 32, width - 1, 32, dark_blue)
                     forecast_4 = self.collection.forecast_list[offset + 4]
                     graphics.DrawText(offscreen_canvas, font_thumb, 0, 39, green,
                                       f'{forecast_4.time} {forecast_4.temp}C')
@@ -177,7 +179,7 @@ class LedDisplayThread(Thread):
                     forecast_4.detail_text.scroll(detail_length3)
 
                     # + 12 hour
-                    graphics.DrawLine(offscreen_canvas, 0, 18, width - 1, 46, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 0, 46, width - 1, 46, dark_blue)
                     forecast_6 = self.collection.forecast_list[offset + 6]
                     graphics.DrawText(offscreen_canvas, font_thumb, 0, 53, green,
                                       f'{forecast_6.time} {forecast_6.temp}C')
@@ -194,7 +196,7 @@ class LedDisplayThread(Thread):
                 elif self.collection.screen == SCREEN_NEWS:
                     #                    graphics.DrawLine(offscreen_canvas, 0, 1, 63, 1, dark_blue)
 
-                    for index, news_item in enumerate(self.collection.news_list, start=0):
+                    for index, news_item in enumerate(self.collection.news_list):
                         #                        if news_item.delay < 1:
                         dep_color = green
 

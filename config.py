@@ -6,8 +6,8 @@ class Config:
         self.datetime_format = config["MAIN"].get("datetime_format", "%d/%m  %H:%M:%S")
         self.width = 128
         self.zs_width = self.width-1
-        self.heigth = 64
-        self.zs_heigth = self.heigth-1
+        self.height = 64
+        self.zs_height = self.height - 1
 
         self.weather_api_key = config["WEATHER"]["apiKey"]
         self.weather_city_id = config["WEATHER"]["cityId"]
