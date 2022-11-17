@@ -7,40 +7,40 @@ from config import Config
 
 class CurrentWeatherFetcher:
 
-    def __init__(self, collection: DataCollection, config1: Config):
+    def __init__(self, collection: DataCollection, config: Config):
         self.collection = collection
-        self.OWM_str = f'http://api.openweathermap.org/data/2.5/weather?id={config1.weather_city_id}&appid={config1.weather_api_key}'
+        self.OWM_str = f'http://api.openweathermap.org/data/2.5/weather?id={config.weather_city_id}&appid={config.weather_api_key}'
         self.logger = logging.getLogger(__name__)
 
     def run(self):
         self.logger.info("Fetching current weather")
         new_weather_data = CurrentWeatherData()
         try:
-            x = requests.get(self.OWM_str).json()
-            if x['cod'] != '404':
-                y = x['main']
-                new_weather_data.temperature = str(round(float(y['temp']) - 273.15, 1))
-                new_weather_data.humidity = self.to_float_str(y['humidity'])
-                if 'sea_level' not in y:
-                    new_weather_data.pressure = self.to_float_str(y['pressure'])
+            response = requests.get(self.OWM_str).json()
+            if response['cod'] != '404':
+                main = response['main']
+                new_weather_data.temperature = str(round(float(main['temp']) - 273.15, 1))
+                new_weather_data.humidity = self.to_float_str(main['humidity'])
+                if 'sea_level' not in main:
+                    new_weather_data.pressure = self.to_float_str(main['pressure'])
                 else:
-                    new_weather_data.pressure = self.to_float_str(y['sea_level'])
-                z = x['weather']
-                new_weather_data.icon = z[0]['icon']
-                new_weather_data.weather_description = z[0]['description']
-                new_weather_data.city = x['name']
-                new_weather_data.wind_speed = x['wind']['speed']
-                if 'deg' in x['wind']:
-                    new_weather_data.wind_dir = x['wind']['deg']
-                new_weather_data.clouds = x['clouds']['all']
-                if 'rain' in x:
-                    rain = x['rain']
+                    new_weather_data.pressure = self.to_float_str(main['sea_level'])
+                weather = response['weather']
+                new_weather_data.icon = weather[0]['icon']
+                new_weather_data.weather_description = weather[0]['description']
+                new_weather_data.city = response['name']
+                new_weather_data.wind_speed = response['wind']['speed']
+                if 'deg' in response['wind']:
+                    new_weather_data.wind_dir = response['wind']['deg']
+                new_weather_data.clouds = response['clouds']['all']
+                if 'rain' in response:
+                    rain = response['rain']
                     if '1h' in rain:
                         new_weather_data.rain_1h = float(rain['1h'])
                     if '3h' in rain:
                         new_weather_data.rain_3h = float(rain['3h'])
-                if 'snow' in x:
-                    snow = x['snow']
+                if 'snow' in response:
+                    snow = response['snow']
                     if '1h' in snow:
                         new_weather_data.snow_1h = float(snow['1h'])
                     if '3h' in snow:
@@ -61,10 +61,10 @@ class CurrentWeatherFetcher:
     def to_float_str(inputstr):
         return str(round(float(inputstr), 1))
 
-    def read_icon(self, cwd: CurrentWeatherData):
+    def read_icon(self, weather_data: CurrentWeatherData):
         # print(f'Loading icon {cwd.icon}.bmp')
         try:
-            cwd.weather_icon = Image.open(f'{cwd.icon}.bmp').convert('RGB')
+            weather_data.weather_icon = Image.open(f'{weather_data.icon}.bmp').convert('RGB')
         except IOError:
-            self.logger.error('Icon %s not found', {cwd.icon})
-            cwd.weather_icon = Image.open('unknown.bmp').convert('RGB')
+            self.logger.error('Icon %s not found', {weather_data.icon})
+            weather_data.weather_icon = Image.open('unknown.bmp').convert('RGB')
