@@ -39,7 +39,7 @@ class TrainDepartureFetcher:
             train = data.get_stop_info(stop_id)
             dindex = 0
             for index, call in enumerate(train.estimated_calls):
-                #                print(f'|{call.front_display}|')
+                print(f'|{call.front_display}|')
                 #                for d in self.destinations:
                 #                    print(f'destination: |{d}|')
                 if dindex < self.config.max_train_departures and call.front_display in self.config.destinations:  # or (1 == 1):

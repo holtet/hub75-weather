@@ -116,7 +116,7 @@ class LedDisplayThread(Thread):
                                                          f'{outdoor.temperature} C')
                     graphics.DrawCircle(offscreen_canvas, temp_text_length - 8+63, 8, 1, green)
                     graphics.DrawText(offscreen_canvas, font_6x12, 63, 23, green, f'{outdoor.humidity} %')
-                    offscreen_canvas.SetImage(outdoor.weather_icon, 45, 30)
+                    offscreen_canvas.SetImage(outdoor.weather_icon, 65, 30)
 
                     #                detail1_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text1.pos, 25, green, outdoor.detail_text1.text)
                     #                outdoor.detail_text1.scroll(detail1_length)

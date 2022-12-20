@@ -70,5 +70,5 @@ if __name__ == "__main__":
     cthread = Coordinator(dataCollection, config, scheduler)
     cthread.start()
 
-    lthread = LedDisplayThread(dataCollection)
+    lthread = LedDisplayThread(dataCollection, config)
     lthread.start()
