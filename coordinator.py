@@ -13,7 +13,7 @@ class Coordinator(Thread):
         self.collection = collection
         self.config = config
         self.scheduler = scheduler
-        self.layout = TimePeriod("Default", [5, 5, 5, 5, 5, 5, 5])
+        self.layout = TimePeriod("Default", [5, 20, 15, 5, 0, 0, 5])
         self.logger = logging.getLogger(__name__)
 
     def run(self):
