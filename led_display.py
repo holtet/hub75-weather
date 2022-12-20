@@ -36,21 +36,22 @@ class LedDisplayThread(Thread):
 
         font_thumb = graphics.Font()
         font_thumb.LoadFont("rpi-rgb-led-matrix/fonts/tom-thumb.bdf")
+
         font_6x12 = graphics.Font()
         font_6x12.LoadFont("rpi-rgb-led-matrix/fonts/6x12.bdf")
 
-        font_4x6 = graphics.Font()
-        font_4x6.LoadFont("rpi-rgb-led-matrix/fonts/4x6.bdf")
+        font_5x7 = graphics.Font()
+        font_5x7.LoadFont("rpi-rgb-led-matrix/fonts/5x7.bdf")
 
         font_6x9 = graphics.Font()
         font_6x9.LoadFont("rpi-rgb-led-matrix/fonts/6x9.bdf")
 
-        home_image = Image.open("heart_house.bmp").convert('RGB')
+        home_image = Image.open("heart_house_20.bmp").convert('RGB')
 
         black = graphics.Color(0, 0, 0)
         red = graphics.Color(128, 0, 0)
-        purple = graphics.Color(28, 65, 84)
-        light_blue = graphics.Color(0, 0, 128)
+        purple = graphics.Color(65, 28, 84)
+        light_blue = graphics.Color(0, 78, 78)
         dark_blue = graphics.Color(0, 0, 32)
         green = graphics.Color(0, 128, 0)
         orange = graphics.Color(128, 75, 0)
@@ -89,9 +90,9 @@ class LedDisplayThread(Thread):
                     time.sleep(0.03)
 
                 elif self.collection.screen == SCREEN_INDOOR:
-                    graphics.DrawLine(offscreen_canvas, 0, 5, self.config.zs_width, 5, dark_blue)
-                    graphics.DrawLine(offscreen_canvas, 62, 0, 62, 45, dark_blue)
-                    graphics.DrawText(offscreen_canvas, font_thumb, 2, 5, red, f'{self.collection.datetime}')
+                    graphics.DrawLine(offscreen_canvas, 0, 7, self.config.zs_width, 5, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 62, 7, 62, 45, dark_blue)
+                    graphics.DrawText(offscreen_canvas, font_5x7, 2, 5, light_blue, f'{self.collection.datetime}')
                     indoor = self.collection.indoor_environment_data
                     outdoor = self.collection.current_weather_data
                     temp_text_length = graphics.DrawText(offscreen_canvas, font_6x12, 1, 14, green,
@@ -104,9 +105,9 @@ class LedDisplayThread(Thread):
                                                        height - 2, green,
                                                        outdoor.detail_text2.text)
                     outdoor.detail_text2.scroll(detail2_length)
-                    offscreen_canvas.SetImage(home_image, 0, 30)
+                    offscreen_canvas.SetImage(home_image, 0, 20)
 
-                    outdoor = self.collection.current_weather_data
+                    # outdoor = self.collection.current_weather_data
 #                    graphics.DrawLine(offscreen_canvas, 0, 5, self.config.zs_width, 5, dark_blue)
 #                    graphics.DrawText(offscreen_canvas, font_thumb, 2, 5, red, f'{self.collection.datetime}')
                     #                    header_text_length = graphics.DrawText(offscreen_canvas, font, outdoor.header_text.pos, 5, red,
