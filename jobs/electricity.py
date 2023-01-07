@@ -13,6 +13,10 @@ def job_id():
     return 'electricity_job_id'
 
 
+def interval():
+    return 3600
+
+
 class ElectricityFetcher(AbstractJob):
 
     def __init__(self, collection: DataCollection):
@@ -38,7 +42,7 @@ class ElectricityFetcher(AbstractJob):
                 electricity_prices.max_price = max(map(lambda x: x.price_nok, electricity_prices.prices))
                 # reduce(self.compare_max_price(), electricity_prices.prices).price_nok
                 electricity_prices.min_price = min(map(lambda x: x.price_nok, electricity_prices.prices))
-                #reduce(self.compare_min_price(), electricity_prices.prices).price_nok
+                # reduce(self.compare_min_price(), electricity_prices.prices).price_nok
                 # self.logger.info("Min: %s ", electricity_prices.min_price)
                 # self.logger.info("Max: %s ", electricity_prices.max_price)
 
