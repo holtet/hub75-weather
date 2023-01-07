@@ -1,3 +1,6 @@
+[MAIN]
+datetime_format = %%d/%%m  %%H:%%M:%%S
+
 [TRAINS]
 stopId = 127
 destinations = L22 Skøyen,R20 Oslo S,L2x Stabekk,L2 Stabekk,L21 Stabekk

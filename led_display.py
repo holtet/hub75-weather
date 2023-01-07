@@ -77,9 +77,8 @@ class LedDisplayThread(Thread):
                         y1 = y0 + 5
                         text_length = graphics.DrawText(offscreen_canvas, font_thumb, 0, y1, dep_color,
                                                         departure.train_name())
-                        #                        text_length = graphics.DrawText(offscreen_canvas, font, news_item.display.pos, y1, dep_color,
-                        #                                                         news_item.text1())
-                        #                        news_item.display.scroll(text_length)
+                        # text_length = graphics.DrawText(offscreen_canvas, font, news_item.display.pos, y1,
+                        # dep_color, news_item.text1()) news_item.display.scroll(text_length)
                         for y in range(y0, y1):
                             graphics.DrawLine(offscreen_canvas, width - 19, y, self.config.zs_width, y, black)
                         graphics.DrawLine(offscreen_canvas, width - 20, y0, width - 20, y1, dark_blue)

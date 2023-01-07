@@ -3,6 +3,8 @@ import functools
 import operator
 
 from const import *
+from dt.electricity_prices import ElectricityPrices
+
 
 class NewsItem:
     def __init__(self, text):
@@ -190,6 +192,7 @@ class DataCollection:
         self.current_screen_time = 0
         self.indoor_environment_data = IndoorEnvironmentData()
         self.current_weather_data = CurrentWeatherData()
+        self.electricity_prices = ElectricityPrices()
         self.departure_list = []
         self.news_list = []
         for i in range(0, 8):

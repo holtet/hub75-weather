@@ -23,7 +23,7 @@ class WeatherForecastFetcher:
                 forecasts = response['list']
                 for forecast in forecasts:
                     fore = Forecast()
-                    dt = datetime.datetime.fromtimestamp(forecast['dt'])
+                    dt = datetime.datetime.fromtimestamp(forecast['dto'])
                     fore.weekday = dt.strftime('%a %d/%m')
                     fore.time = dt.strftime('%H:%M')
                     main = forecast['main']

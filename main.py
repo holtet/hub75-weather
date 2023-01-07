@@ -5,6 +5,8 @@ from config import Config
 from coordinator import Coordinator
 from entur import TrainDepartureFetcher
 from current_weather import CurrentWeatherFetcher
+from jobs.Job import AbstractJob
+from jobs.electricity import ElectricityFetcher
 from weather_forecast import WeatherForecastFetcher
 from indoor_environment import IndoorEnvironmentFetcher
 from news import NewsFetcher
@@ -32,6 +34,13 @@ if __name__ == "__main__":
 
     scheduler = BackgroundScheduler(job_defaults=job_defaults)
     joblist = {}
+
+    electricity: AbstractJob = ElectricityFetcher(dataCollection)
+    electricity.run()
+    electricity_job = scheduler.add_job(electricity.run,
+                                        trigger='interval',
+                                        seconds=electricity.interval(),
+                                        id=electricity.job_id())
 
     wff = WeatherForecastFetcher(dataCollection, config)
     wff.run()
