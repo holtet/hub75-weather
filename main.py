@@ -39,7 +39,7 @@ if __name__ == "__main__":
     electricity.run()
     electricity_job = scheduler.add_job(electricity.run,
                                         trigger='interval',
-                                        seconds=electricity.interval(),
+                                        seconds=3600,
                                         id=electricity.job_id())
 
     wff = WeatherForecastFetcher(dataCollection, config)

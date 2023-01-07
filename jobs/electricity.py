@@ -13,7 +13,7 @@ def job_id():
     return 'electricity_job_id'
 
 
-def interval():
+def interval() -> int:
     return 3600
 
 
