@@ -90,7 +90,7 @@ class LedDisplayThread(Thread):
 
                 elif self.collection.screen == SCREEN_INDOOR:
                     graphics.DrawLine(offscreen_canvas, 0, 5, self.config.zs_width, 5, dark_blue)
-                    graphics.DrawLine(offscreen_canvas, 62, 7, 62, 45, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 62, 7, 62, 50, dark_blue)
                     graphics.DrawText(offscreen_canvas, font_5x7, 2, 5, light_blue, f'{self.collection.datetime}')
                     indoor = self.collection.indoor_environment_data
                     outdoor = self.collection.current_weather_data
@@ -103,7 +103,7 @@ class LedDisplayThread(Thread):
                     detail2_length = graphics.DrawText(offscreen_canvas, font_thumb, outdoor.detail_text2.pos,
                                                        height - 2, green,
                                                        outdoor.detail_text2.text)
-                    outdoor.detail_text2.scroll(detail2_length)
+#                    outdoor.detail_text2.scroll(detail2_length)
                     offscreen_canvas.SetImage(home_image, 11, 26)
 
                     # outdoor = self.collection.current_weather_data
@@ -114,9 +114,10 @@ class LedDisplayThread(Thread):
                     #                    outdoor.header_text.scroll(header_text_length)
                     temp_text_length = graphics.DrawText(offscreen_canvas, font_6x12, 72, 16, green,
                                                          f'{outdoor.temperature} C')
-                    graphics.DrawCircle(offscreen_canvas, temp_text_length - 8+63+8, 10, 1, green)
+                    graphics.DrawCircle(offscreen_canvas, temp_text_length + 63, 10, 1, green)
                     graphics.DrawText(offscreen_canvas, font_6x12, 72, 25, green, f'{outdoor.humidity} %')
-                    offscreen_canvas.SetImage(outdoor.weather_icon, 76, 26)
+                    offscreen_canvas.SetImage(outdoor.weather_icon, 80, 27)
+                    graphics.DrawText(offscreen_canvas, font_thumb, 68, 50, green, f'{outdoor.weather_description}')
 
                     #                detail1_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text1.pos, 25, green, outdoor.detail_text1.text)
                     #                outdoor.detail_text1.scroll(detail1_length)
@@ -146,7 +147,7 @@ class LedDisplayThread(Thread):
                     detail2_length = graphics.DrawText(offscreen_canvas, font_thumb, outdoor.detail_text2.pos,
                                                        self.config.height - 2, green,
                                                        outdoor.detail_text2.text)
-                    outdoor.detail_text2.scroll(detail2_length)
+#                    outdoor.detail_text2.scroll(detail2_length)
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
                     time.sleep(0.03)
 
