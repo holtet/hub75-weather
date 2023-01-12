@@ -1,24 +1,24 @@
-import logging
-from threading import Event
-from dto import *
-from config import Config
-from coordinator import Coordinator
-from entur import TrainDepartureFetcher
-from current_weather import CurrentWeatherFetcher
-from jobs.Job import AbstractJob
-from jobs.electricity import ElectricityFetcher
-from weather_forecast import WeatherForecastFetcher
-from indoor_environment import IndoorEnvironmentFetcher
-from news import NewsFetcher
-from led_display import LedDisplayThread
-from listener import Listener
-from const import *
 import configparser
+import logging
+
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR
 from apscheduler.schedulers.background import BackgroundScheduler
 
-logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s %(message)s', level=logging.WARNING)
+from config import Config
+from const import *
+from coordinator import Coordinator
+from current_weather import CurrentWeatherFetcher
+from dto import *
+from entur import TrainDepartureFetcher
+from indoor_environment import IndoorEnvironmentFetcher
+from jobs.Job import AbstractJob
+from jobs.electricity import ElectricityFetcher
+from led_display import LedDisplayThread
+from listener import Listener
+from news import NewsFetcher
+from weather_forecast import WeatherForecastFetcher
 
+logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s %(message)s', level=logging.WARNING)
 
 # Main function
 if __name__ == "__main__":
@@ -39,8 +39,10 @@ if __name__ == "__main__":
     electricity.run()
     electricity_job = scheduler.add_job(electricity.run,
                                         trigger='interval',
-                                        seconds=3600,
+                                        seconds=electricity.interval(),
                                         id=electricity.job_id())
+    joblist[electricity.job_id()] = Job(electricity_job, electricity.interval(), 600)
+    # Lag metode for start+add jobb
 
     wff = WeatherForecastFetcher(dataCollection, config)
     wff.run()
@@ -74,7 +76,7 @@ if __name__ == "__main__":
 
     scheduler.start()
 
-#    stopFlag = Event()
+    #    stopFlag = Event()
 
     cthread = Coordinator(dataCollection, config, scheduler)
     cthread.start()

@@ -6,6 +6,7 @@ from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
 from threading import Thread
 
 from config import Config
+from display.ElectricityDisplay import ElectricityDisplay
 from dto import *
 
 
@@ -59,6 +60,8 @@ class LedDisplayThread(Thread):
         green = graphics.Color(0, 128, 0)
         orange = graphics.Color(128, 75, 0)
 
+        electricity_display = ElectricityDisplay(self.config)
+
         while True:
             try:
                 offscreen_canvas.Clear()
@@ -107,7 +110,7 @@ class LedDisplayThread(Thread):
                                                        self.config.zs_height, green,
                                                        outdoor.detail_text2.text)
 #                    outdoor.detail_text2.scroll(detail2_length)
-                    offscreen_canvas.SetImage(home_image, 11, 26)
+                    offscreen_canvas.SetImage(home_image, 10, 26)
 
                     # outdoor = self.collection.current_weather_data
 #                    graphics.DrawLine(offscreen_canvas, 0, 5, self.config.zs_width, 5, dark_blue)
@@ -133,23 +136,24 @@ class LedDisplayThread(Thread):
                     time.sleep(0.03)
 
                 elif self.collection.screen == SCREEN_OUTDOOR:
-                    outdoor = self.collection.current_weather_data
-                    graphics.DrawLine(offscreen_canvas, 0, 5, self.config.zs_width, 5, dark_blue)
-                    graphics.DrawText(offscreen_canvas, font_thumb, 2, 5, red, f'{self.collection.datetime}')
+                    electricity_display.display(self.collection.electricity_prices, offscreen_canvas)
+                    # outdoor = self.collection.current_weather_data
+                    # graphics.DrawLine(offscreen_canvas, 0, 5, self.config.zs_width, 5, dark_blue)
+                    # graphics.DrawText(offscreen_canvas, font_thumb, 2, 5, red, f'{self.collection.datetime}')
                     #                    header_text_length = graphics.DrawText(offscreen_canvas, font, outdoor.header_text.pos, 5, red,
                     #                                                           outdoor.header_text.text)
                     #                    outdoor.header_text.scroll(header_text_length)
-                    temp_text_length = graphics.DrawText(offscreen_canvas, font_6x12, 1, 14, green,
-                                                         f'{outdoor.temperature} C')
-                    graphics.DrawCircle(offscreen_canvas, temp_text_length - 8, 8, 1, green)
-                    graphics.DrawText(offscreen_canvas, font_6x12, 1, 23, green, f'{outdoor.humidity} %')
-                    offscreen_canvas.SetImage(outdoor.weather_icon, 45, 7)
+                    # temp_text_length = graphics.DrawText(offscreen_canvas, font_6x12, 1, 14, green,
+                    #                                      f'{outdoor.temperature} C')
+                    # graphics.DrawCircle(offscreen_canvas, temp_text_length - 8, 8, 1, green)
+                    # graphics.DrawText(offscreen_canvas, font_6x12, 1, 23, green, f'{outdoor.humidity} %')
+                    # offscreen_canvas.SetImage(outdoor.weather_icon, 45, 7)
 
                     #                detail1_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text1.pos, 25, green, outdoor.detail_text1.text)
                     #                outdoor.detail_text1.scroll(detail1_length)
-                    detail2_length = graphics.DrawText(offscreen_canvas, font_thumb, outdoor.detail_text2.pos,
-                                                       self.config.height - 2, green,
-                                                       outdoor.detail_text2.text)
+                    # detail2_length = graphics.DrawText(offscreen_canvas, font_thumb, outdoor.detail_text2.pos,
+                    #                                    self.config.height - 2, green,
+                    #                                    outdoor.detail_text2.text)
 #                    outdoor.detail_text2.scroll(detail2_length)
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
                     time.sleep(0.03)

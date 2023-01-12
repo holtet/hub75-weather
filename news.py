@@ -9,26 +9,27 @@ class NewsFetcher:
     def __init__(self, collection: DataCollection, config1: Config):
         self.collection = collection
         self.config = config1
-        self.api = twitter.Api("","","","")
-        
+        self.api = twitter.Api("", "", "", "")
+
     def run(self):
         try:
             print("Fetching news")
-#            NewsFeed = feedparser.parse("https://www.nrk.no/toppsaker.rss")
-#            newsFeed = feedparser.parse("https://www.nrk.no/osloogviken/toppsaker.rss")
-            newsFeed = feedparser.parse("https://www.vg.no/rss/feed/?categories=1069%2C1070&limit=10&format=rss&private=1")
+            #            NewsFeed = feedparser.parse("https://www.nrk.no/toppsaker.rss")
+            #            news_feed = feedparser.parse("https://www.nrk.no/osloogviken/toppsaker.rss")
+            news_feed = feedparser.parse(
+                "https://www.vg.no/rss/feed/?categories=1069%2C1070&limit=10&format=rss&private=1")
 
-            for index, entry in enumerate(newsFeed.entries[:8]):
-#                print(str(entry))
-                self.collection.news_list[index] = NewsItem(f'{entry.title} - {entry.summary}')             
-#                self.collection.news_list[index] = NewsItem(f'{entry.summary}')             
-#            entry = NewsFeed.entries[1]
+            for index, entry in enumerate(news_feed.entries[:8]):
+                #                print(str(entry))
+                self.collection.news_list[index] = NewsItem(f'{entry.title} - {entry.summary}')
+            #                self.collection.news_list[index] = NewsItem(f'{entry.summary}')
+        #            entry = NewsFeed.entries[1]
 
-#            print (entry.published)
-#            print ("******")
-#            print (entry.summary)
-#            print ("------News Link--------")
-#            print (entry.link)
+        #            print (entry.published)
+        #            print ("******")
+        #            print (entry.summary)
+        #            print ("------News Link--------")
+        #            print (entry.link)
 
         except Exception as e:
             print(f'News fetcher failed: {str(e)}')
