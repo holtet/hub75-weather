@@ -181,7 +181,7 @@ class CurrentWeatherData:
         # {snow_text}
         # {rain_text}
         self.detail_text2 = ScrollText(
-            f'Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0,
+            f'Wind {self.wind_speed}m/s  Clouds {self.clouds}%', 0,
             128, 128)
         # {self.pressure} hPa  TODO: Farge avh av vær
 

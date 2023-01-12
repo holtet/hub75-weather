@@ -56,7 +56,7 @@ class LedDisplayThread(Thread):
         red = graphics.Color(128, 0, 0)
         purple = graphics.Color(28, 65, 84)
         light_blue = graphics.Color(78, 0, 78)
-        dark_blue = graphics.Color(0, 0, 32)
+        dark_blue = graphics.Color(0, 0, 32) # er rød
         green = graphics.Color(0, 128, 0)
         orange = graphics.Color(128, 75, 0)
 
@@ -95,8 +95,8 @@ class LedDisplayThread(Thread):
                     time.sleep(0.03)
 
                 elif self.collection.screen == SCREEN_INDOOR:
-                    graphics.DrawLine(offscreen_canvas, 0, 5, self.config.zs_width, 5, dark_blue)
-                    graphics.DrawLine(offscreen_canvas, 62, 7, 62, 50, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 0, 6, self.config.zs_width, 6, dark_blue)
+                    graphics.DrawLine(offscreen_canvas, 60, 7, 60, 50, dark_blue)
                     graphics.DrawText(offscreen_canvas, font_5x7, 2, 5, light_blue, f'{self.collection.datetime}')
                     indoor = self.collection.indoor_environment_data
                     outdoor = self.collection.current_weather_data
@@ -110,7 +110,7 @@ class LedDisplayThread(Thread):
                                                        self.config.zs_height, green,
                                                        outdoor.detail_text2.text)
 #                    outdoor.detail_text2.scroll(detail2_length)
-                    offscreen_canvas.SetImage(home_image, 10, 26)
+                    offscreen_canvas.SetImage(home_image, 12, 26)
 
                     # outdoor = self.collection.current_weather_data
 #                    graphics.DrawLine(offscreen_canvas, 0, 5, self.config.zs_width, 5, dark_blue)
@@ -123,7 +123,7 @@ class LedDisplayThread(Thread):
                     graphics.DrawCircle(offscreen_canvas, temp_text_length + 63, 10, 1, green)
                     graphics.DrawText(offscreen_canvas, font_6x12, 72, 25, green, f'{outdoor.humidity} %')
                     offscreen_canvas.SetImage(outdoor.weather_icon, 80, 26)
-                    graphics.DrawText(offscreen_canvas, font_thumb, 67, 50, green, f'{outdoor.weather_description}')
+                    graphics.DrawText(offscreen_canvas, font_thumb, 65, 50, green, f'{outdoor.weather_description}')
 
                     #                detail1_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text1.pos, 25, green, outdoor.detail_text1.text)
                     #                outdoor.detail_text1.scroll(detail1_length)
