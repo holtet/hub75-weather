@@ -1,9 +1,11 @@
 class AbstractJob:
-    def job_id(self) -> str:
+    @staticmethod
+    def job_id() -> str:
         pass
 
     def run(self):
         pass
 
-    def interval(self) -> int:
+    @staticmethod
+    def interval() -> int:
         pass

@@ -178,8 +178,10 @@ class CurrentWeatherData:
             rain_text = f'Rain 1h: {self.rain_1h}mm Rain 3h: {self.rain_3h}mm '
         elif self.rain_3h > 0.0:
             rain_text = f'Rain 3h: {self.rain_3h}mm '
+        # {snow_text}
+        # {rain_text}
         self.detail_text2 = ScrollText(
-            f'{snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0,
+            f'Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0,
             128, 128)
         # {self.pressure} hPa  TODO: Farge avh av vær
 

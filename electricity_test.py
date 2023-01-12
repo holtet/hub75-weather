@@ -1,4 +1,6 @@
 import logging
+
+from display.ElectricityDisplay import ElectricityDisplay
 from dto import *
 # from dto import *
 # from dt.electricity_prices import ElectricityPrices
@@ -33,11 +35,15 @@ if __name__ == "__main__":
     logger.info("Size: %s ", len(electricity_prices.prices))
     ts = electricity_prices.prices[0].time_start
     datetime_format = "%Y-%m%dT%H%M%S"
+    print(f'S: {electricity_fetcher.interval()}')
+    print(f'J: {electricity_fetcher.job_id()}')
 
     for p in electricity_prices.prices:
         # logger.info("\n%s, %s", p.time_start)
         logger.info("\n%s, %s", p.price_nok, datetime.datetime.strftime(p.time_start, "%H"))
     # logger.info("Date: %s \n%s", ts, datetime.datetime.fromisoformat(ts))
+    eld = ElectricityDisplay(config)
+    eld.display(electricity_prices, offscreen_canvas)
 
 #     wff_job = scheduler.add_job(wff.run, trigger='interval', seconds=3600, id=WFF_JOB_ID)
 #     joblist[WFF_JOB_ID] = Job(wff_job, 3600, 600)

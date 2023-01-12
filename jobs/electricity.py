@@ -9,15 +9,15 @@ from dt.electricity_prices import ElectricityPrices
 from jobs.Job import AbstractJob
 
 
-def job_id():
-    return 'electricity_job_id'
-
-
-def interval() -> int:
-    return 3600
-
-
 class ElectricityFetcher(AbstractJob):
+
+    @staticmethod
+    def interval() -> int:
+        return 3600
+
+    @staticmethod
+    def job_id():
+        return 'electricity_job_id'
 
     def __init__(self, collection: DataCollection):
         self.collection = collection
