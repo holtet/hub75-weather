@@ -43,6 +43,9 @@ class LedDisplayThread(Thread):
         font_5x7 = graphics.Font()
         font_5x7.LoadFont("rpi-rgb-led-matrix/fonts/5x7.bdf")
 
+        font_4x6 = graphics.Font()
+        font_4x6.LoadFont("rpi-rgb-led-matrix/fonts/4x6.bdf")
+
         font_6x9 = graphics.Font()
         font_6x9.LoadFont("rpi-rgb-led-matrix/fonts/6x9.bdf")
 
@@ -100,8 +103,8 @@ class LedDisplayThread(Thread):
                     graphics.DrawCircle(offscreen_canvas, temp_text_length - 0, 10, 1, green)
                     #                    graphics.DrawText(offscreen_canvas, font2, 1, 32, green, f'{indoor.pressure:.1f} hPa')
                     #                    graphics.DrawText(offscreen_canvas, font, 1, 32, green, outdoor.weather_description)
-                    detail2_length = graphics.DrawText(offscreen_canvas, font_thumb, outdoor.detail_text2.pos,
-                                                       height - 2, green,
+                    detail2_length = graphics.DrawText(offscreen_canvas, font_5x7, 0, #outdoor.detail_text2.pos,
+                                                       self.config.zs_height, green,
                                                        outdoor.detail_text2.text)
 #                    outdoor.detail_text2.scroll(detail2_length)
                     offscreen_canvas.SetImage(home_image, 11, 26)
@@ -117,7 +120,7 @@ class LedDisplayThread(Thread):
                     graphics.DrawCircle(offscreen_canvas, temp_text_length + 63, 10, 1, green)
                     graphics.DrawText(offscreen_canvas, font_6x12, 72, 25, green, f'{outdoor.humidity} %')
                     offscreen_canvas.SetImage(outdoor.weather_icon, 80, 26)
-                    graphics.DrawText(offscreen_canvas, font_thumb, 68, 50, green, f'{outdoor.weather_description}')
+                    graphics.DrawText(offscreen_canvas, font_thumb, 67, 50, green, f'{outdoor.weather_description}')
 
                     #                detail1_length = graphics.DrawText(offscreen_canvas, font, outdoor.detail_text1.pos, 25, green, outdoor.detail_text1.text)
                     #                outdoor.detail_text1.scroll(detail1_length)

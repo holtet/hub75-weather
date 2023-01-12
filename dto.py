@@ -166,7 +166,7 @@ class CurrentWeatherData:
         self.header_text = ScrollText(f'{self.city}: {self.weather_description}', 0, 128, 128)
 
     def set_detail_text1(self):
-        self.detail_text1 = ScrollText(f'Wind: {self.wind_speed}m/s  Cloud%: {self.clouds}', 0, 128, 128)
+        self.detail_text1 = ScrollText(f'Wind:{self.wind_speed}m/s  Cloud%:{self.clouds}', 0, 128, 128)
 
     def set_detail_text2(self):
         rain_text = ""
@@ -179,7 +179,7 @@ class CurrentWeatherData:
         elif self.rain_3h > 0.0:
             rain_text = f'Rain 3h: {self.rain_3h}mm '
         self.detail_text2 = ScrollText(
-            f'{snow_text}{rain_text}Wind: {self.wind_speed}m/s  Clouds: {self.clouds}%', 0,
+            f'{snow_text}{rain_text}Wind:{self.wind_speed}m/s  Clouds:{self.clouds}%', 0,
             128, 128)
         # {self.pressure} hPa  TODO: Farge avh av vær
 
