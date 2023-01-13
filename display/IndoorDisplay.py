@@ -14,7 +14,7 @@ class IndoorDisplay(Display):
         self.config = config
         self.collection = collection
         self.logger = logging.getLogger(__name__)
-        self.home_image = Image.open("images/heart_house_24.bmp").convert('BGR;24')
+        self.home_image = Image.open("images/heart_house_24.bmp").convert('RGB')
 
         self.weather_icons = {}
         dir_path = 'images/weather'
@@ -22,7 +22,7 @@ class IndoorDisplay(Display):
             # check if current path is a file
             join = os.path.join(dir_path, path)
             if os.path.isfile(join):
-                self.weather_icons[path] = Image.open(join).convert('BGR;24')
+                self.weather_icons[path] = Image.open(join).convert('RGB')
 
     def display(self, canvas):
         graphics.DrawLine(canvas, 0, 6, self.config.zs_width, 6, self.grey)
