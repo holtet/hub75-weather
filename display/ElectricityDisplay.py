@@ -23,15 +23,16 @@ class ElectricityDisplay(Display):
         current_hour = int(datetime.today().strftime("%H"))
         current_minute = datetime.today().strftime("%M")
 
+#Start fra 0 istedet
         graphics.DrawText(canvas, self.font_thumb, 0, 5, self.purple, f'{self.electricity_prices.max_price:.1f}')
-        graphics.DrawLine(canvas, 20, 5, 127, 5, self.grey)
-        graphics.DrawText(canvas, self.font_thumb, 0, 18, self.purple, f'{self.electricity_prices.min_price+3*price_delta/4:.1f}')
-        graphics.DrawLine(canvas, 20, 18, 127, 18, self.grey)
-        graphics.DrawText(canvas, self.font_thumb, 0, 31, self.purple, f'{self.electricity_prices.min_price+2*price_delta/4:.1f}')
-        graphics.DrawLine(canvas, 20, 31, 127, 31, self.grey)
-        graphics.DrawText(canvas, self.font_thumb, 0, 44, self.purple, f'{self.electricity_prices.min_price+1*price_delta/4:.1f}')
-        graphics.DrawLine(canvas, 20, 44, 127, 44, self.grey)
-        graphics.DrawText(canvas, self.font_thumb, 0, 57, self.purple, f'{self.electricity_prices.min_price:.1f}')
+        graphics.DrawLine(canvas, 20, 1, 127, 1, self.grey)
+        graphics.DrawText(canvas, self.font_thumb, 0, 19, self.purple, f'{self.electricity_prices.min_price+3*price_delta/4:.1f}')
+        graphics.DrawLine(canvas, 20, 15, 127, 15, self.grey)
+        graphics.DrawText(canvas, self.font_thumb, 0, 33, self.purple, f'{self.electricity_prices.min_price+2*price_delta/4:.1f}')
+        graphics.DrawLine(canvas, 20, 29, 127, 29, self.grey)
+        graphics.DrawText(canvas, self.font_thumb, 0, 47, self.purple, f'{self.electricity_prices.min_price+1*price_delta/4:.1f}')
+        graphics.DrawLine(canvas, 20, 43, 127, 43, self.grey)
+        graphics.DrawText(canvas, self.font_thumb, 0, 61, self.purple, f'{self.electricity_prices.min_price:.1f}')
         graphics.DrawLine(canvas, 20, 57, 127, 57, self.grey)
 
         for x in range(len(self.electricity_prices.prices) - 1):
@@ -51,11 +52,11 @@ class ElectricityDisplay(Display):
 
             if hour == current_hour:
                 #               self.logger.info("circle %s,%s", x1pos, y1pos)
-                graphics.DrawCircle(canvas, x1pos+2, y1pos+2, 2, self.white)
+                graphics.DrawCircle(canvas, x1pos, y1pos, 2, self.white)
 
                 text = str(round(float(p1.price_nok), 1))
 
-                x1textpos = x1pos + 2
+                x1textpos = x1pos + 2 # Lage noe så den havner i midten av en rute?
                 if self.config.width - x1textpos < 12:
                     x1textpos = self.config.width - 12
                 if x1textpos < 20:

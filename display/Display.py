@@ -1,5 +1,4 @@
 from rgbmatrix import graphics
-from PIL import Image
 
 
 class Display:
@@ -8,7 +7,7 @@ class Display:
     purple = graphics.Color(28, 65, 84)
     light_blue = graphics.Color(78, 0, 78)
     green = graphics.Color(0, 127, 0)
-    grey = graphics.Color(32, 32, 32)
+    grey = graphics.Color(20, 20, 20)
     white = graphics.Color(127, 127, 127)
     orange = graphics.Color(127, 75, 0)
     red = graphics.Color(127, 0, 0)
