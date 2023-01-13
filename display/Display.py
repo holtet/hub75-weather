@@ -2,15 +2,16 @@ from rgbmatrix import graphics
 
 
 class Display:
+    # rød og blå er byttet
     black = graphics.Color(0, 0, 0)
-    dark_blue = graphics.Color(0, 0, 127)
-    purple = graphics.Color(28, 65, 84)
+    dark_blue = graphics.Color(127, 0, 0)
+    purple = graphics.Color(84, 65, 28)
     light_blue = graphics.Color(78, 0, 78)
     green = graphics.Color(0, 127, 0)
     grey = graphics.Color(20, 20, 20)
     white = graphics.Color(127, 127, 127)
-    orange = graphics.Color(127, 75, 0)
-    red = graphics.Color(127, 0, 0)
+    orange = graphics.Color(0, 75, 127)
+    red = graphics.Color(0, 0, 127)
 
     font_thumb = graphics.Font()
     font_thumb.LoadFont("../rpi-rgb-led-matrix/fonts/tom-thumb.bdf")
