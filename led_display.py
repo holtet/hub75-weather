@@ -7,7 +7,9 @@ from threading import Thread
 
 from config import Config
 from display.ElectricityDisplay import ElectricityDisplay
+from display.ForecastDisplay import ForecastDisplay
 from display.IndoorDisplay import IndoorDisplay
+from display.NewsDisplay import NewsDisplay
 from display.TrainDisplay import TrainDisplay
 from dto import *
 
@@ -65,6 +67,8 @@ class LedDisplayThread(Thread):
         electricity_display = ElectricityDisplay(self.config, self.collection.electricity_prices)
         indoor_display = IndoorDisplay(self.config, self.collection)
         train_display = TrainDisplay(self.config, self.collection.departure_list)
+        news_display = NewsDisplay(self.config, self.collection.news_list)
+        forecast_display = ForecastDisplay(self.config, self.collection)
 
         while True:
             try:
@@ -169,77 +173,79 @@ class LedDisplayThread(Thread):
                         self.collection.screen == SCREEN_FORECAST_1
                         or self.collection.screen == SCREEN_FORECAST_2
                         or self.collection.screen == SCREEN_FORECAST_3):
-                    offset = 0
-                    if self.collection.screen == SCREEN_FORECAST_3:
-                        offset = 4
-                    # elif self.collection.screen == SCREEN_FORECAST_3:
-                    #     offset = 8
-                    # Header
-                    graphics.DrawLine(offscreen_canvas, 0, 5, width - 1, 5, dark_blue)
-                    forecast_0 = self.collection.forecast_list[offset]
-                    graphics.DrawText(offscreen_canvas, font_thumb, 0, 5, purple,
-                                      f'{self.collection.current_weather_data.city}  {forecast_0.weekday}')
-
-                    # + 3 hour
-                    graphics.DrawText(offscreen_canvas, font_thumb, 0, 11, green,
-                                      f'{forecast_0.time} {forecast_0.temp}C')
-                    #                graphics.DrawText(offscreen_canvas, font, 0, 17, green, f'{self.collection.forecast_list[offset].weather_desc}')
-                    detail_length1 = graphics.DrawText(offscreen_canvas, font_thumb,
-                                                       forecast_0.detail_text.pos, 17, green,
-                                                       f'{forecast_0.detail_text.text}')
-                    forecast_0.detail_text.scroll(detail_length1)
-
-                    # + 6 hour
-                    graphics.DrawLine(offscreen_canvas, 0, 18, width - 1, 18, dark_blue)
-                    forecast_2 = self.collection.forecast_list[offset + 2]
-                    graphics.DrawText(offscreen_canvas, font_thumb, 0, 25, green,
-                                      f'{forecast_2.time} {forecast_2.temp}C')
-                    #                graphics.DrawText(offscreen_canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
-                    detail_length2 = graphics.DrawText(offscreen_canvas, font_thumb,
-                                                       forecast_2.detail_text.pos, 31,
-                                                       green,
-                                                       f'{forecast_2.detail_text.text}')
-                    forecast_2.detail_text.scroll(detail_length2)
-
-                    # + 9 hour
-                    graphics.DrawLine(offscreen_canvas, 0, 32, width - 1, 32, dark_blue)
-                    forecast_4 = self.collection.forecast_list[offset + 4]
-                    graphics.DrawText(offscreen_canvas, font_thumb, 0, 39, green,
-                                      f'{forecast_4.time} {forecast_4.temp}C')
-                    #                graphics.DrawText(offscreen_canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
-                    detail_length3 = graphics.DrawText(offscreen_canvas, font_thumb,
-                                                       forecast_4.detail_text.pos, 45,
-                                                       green,
-                                                       f'{forecast_4.detail_text.text}')
-                    forecast_4.detail_text.scroll(detail_length3)
-
-                    # + 12 hour
-                    graphics.DrawLine(offscreen_canvas, 0, 46, width - 1, 46, dark_blue)
-                    forecast_6 = self.collection.forecast_list[offset + 6]
-                    graphics.DrawText(offscreen_canvas, font_thumb, 0, 53, green,
-                                      f'{forecast_6.time} {forecast_6.temp}C')
-                    #                graphics.DrawText(offscreen_canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
-                    detail_length4 = graphics.DrawText(offscreen_canvas, font_thumb,
-                                                       forecast_6.detail_text.pos, 59,
-                                                       green,
-                                                       f'{forecast_6.detail_text.text}')
-                    forecast_6.detail_text.scroll(detail_length4)
+                    forecast_display.display(offscreen_canvas)
+                    # offset = 0
+                    # if self.collection.screen == SCREEN_FORECAST_3:
+                    #     offset = 4
+                    # # elif self.collection.screen == SCREEN_FORECAST_3:
+                    # #     offset = 8
+                    # # Header
+                    # graphics.DrawLine(offscreen_canvas, 0, 5, width - 1, 5, dark_blue)
+                    # forecast_0 = self.collection.forecast_list[offset]
+                    # graphics.DrawText(offscreen_canvas, font_thumb, 0, 5, purple,
+                    #                   f'{self.collection.current_weather_data.city}  {forecast_0.weekday}')
+                    #
+                    # # + 3 hour
+                    # graphics.DrawText(offscreen_canvas, font_thumb, 0, 11, green,
+                    #                   f'{forecast_0.time} {forecast_0.temp}C')
+                    # #                graphics.DrawText(offscreen_canvas, font, 0, 17, green, f'{self.collection.forecast_list[offset].weather_desc}')
+                    # detail_length1 = graphics.DrawText(offscreen_canvas, font_thumb,
+                    #                                    forecast_0.detail_text.pos, 17, green,
+                    #                                    f'{forecast_0.detail_text.text}')
+                    # forecast_0.detail_text.scroll(detail_length1)
+                    #
+                    # # + 6 hour
+                    # graphics.DrawLine(offscreen_canvas, 0, 18, width - 1, 18, dark_blue)
+                    # forecast_2 = self.collection.forecast_list[offset + 2]
+                    # graphics.DrawText(offscreen_canvas, font_thumb, 0, 25, green,
+                    #                   f'{forecast_2.time} {forecast_2.temp}C')
+                    # #                graphics.DrawText(offscreen_canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
+                    # detail_length2 = graphics.DrawText(offscreen_canvas, font_thumb,
+                    #                                    forecast_2.detail_text.pos, 31,
+                    #                                    green,
+                    #                                    f'{forecast_2.detail_text.text}')
+                    # forecast_2.detail_text.scroll(detail_length2)
+                    #
+                    # # + 9 hour
+                    # graphics.DrawLine(offscreen_canvas, 0, 32, width - 1, 32, dark_blue)
+                    # forecast_4 = self.collection.forecast_list[offset + 4]
+                    # graphics.DrawText(offscreen_canvas, font_thumb, 0, 39, green,
+                    #                   f'{forecast_4.time} {forecast_4.temp}C')
+                    # #                graphics.DrawText(offscreen_canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
+                    # detail_length3 = graphics.DrawText(offscreen_canvas, font_thumb,
+                    #                                    forecast_4.detail_text.pos, 45,
+                    #                                    green,
+                    #                                    f'{forecast_4.detail_text.text}')
+                    # forecast_4.detail_text.scroll(detail_length3)
+                    #
+                    # # + 12 hour
+                    # graphics.DrawLine(offscreen_canvas, 0, 46, width - 1, 46, dark_blue)
+                    # forecast_6 = self.collection.forecast_list[offset + 6]
+                    # graphics.DrawText(offscreen_canvas, font_thumb, 0, 53, green,
+                    #                   f'{forecast_6.time} {forecast_6.temp}C')
+                    # #                graphics.DrawText(offscreen_canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
+                    # detail_length4 = graphics.DrawText(offscreen_canvas, font_thumb,
+                    #                                    forecast_6.detail_text.pos, 59,
+                    #                                    green,
+                    #                                    f'{forecast_6.detail_text.text}')
+                    # forecast_6.detail_text.scroll(detail_length4)
 
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
                     time.sleep(0.03)
 
                 elif self.collection.screen == SCREEN_NEWS:
+                    news_display.display(offscreen_canvas)
                     #                    graphics.DrawLine(offscreen_canvas, 0, 1, 63, 1, dark_blue)
-
-                    for index, news_item in enumerate(self.collection.news_list):
-                        #                        if news_item.delay < 1:
-                        dep_color = green
-
-                        y0 = index * 6 + 2
-                        y1 = y0 + 5
-                        text_length = graphics.DrawText(offscreen_canvas, font_thumb, news_item.text.pos, y1, dep_color,
-                                                        news_item.text.text)
-                        news_item.text.scroll(text_length)
+                    #
+                    # for index, news_item in enumerate(self.collection.news_list):
+                    #     #                        if news_item.delay < 1:
+                    #     dep_color = green
+                    #
+                    #     y0 = index * 6 + 2
+                    #     y1 = y0 + 5
+                    #     text_length = graphics.DrawText(offscreen_canvas, font_thumb, news_item.text.pos, y1, dep_color,
+                    #                                     news_item.text.text)
+                    #     news_item.text.scroll(text_length)
                     offscreen_canvas = matrix.SwapOnVSync(offscreen_canvas)
                     time.sleep(0.03)
             except Exception as e:
