@@ -23,17 +23,16 @@ class ElectricityDisplay(Display):
         current_hour = int(datetime.today().strftime("%H"))
         current_minute = datetime.today().strftime("%M")
 
-#Start fra 0 istedet
         graphics.DrawText(canvas, self.font_thumb, 0, 5, self.purple, f'{self.electricity_prices.max_price:.1f}')
-        graphics.DrawLine(canvas, 20, 1, 127, 1, self.grey)
+        graphics.DrawLine(canvas, 19, 0, 127, 0, self.grey)
         graphics.DrawText(canvas, self.font_thumb, 0, 19, self.purple, f'{self.electricity_prices.min_price+3*price_delta/4:.1f}')
-        graphics.DrawLine(canvas, 20, 15, 127, 15, self.grey)
+        graphics.DrawLine(canvas, 19, 15, 127, 15, self.grey)
         graphics.DrawText(canvas, self.font_thumb, 0, 33, self.purple, f'{self.electricity_prices.min_price+2*price_delta/4:.1f}')
-        graphics.DrawLine(canvas, 20, 29, 127, 29, self.grey)
+        graphics.DrawLine(canvas, 19, 29, 127, 29, self.grey)
         graphics.DrawText(canvas, self.font_thumb, 0, 47, self.purple, f'{self.electricity_prices.min_price+1*price_delta/4:.1f}')
-        graphics.DrawLine(canvas, 20, 43, 127, 43, self.grey)
+        graphics.DrawLine(canvas, 19, 43, 127, 43, self.grey)
         graphics.DrawText(canvas, self.font_thumb, 0, 61, self.purple, f'{self.electricity_prices.min_price:.1f}')
-        graphics.DrawLine(canvas, 20, 57, 127, 57, self.grey)
+        graphics.DrawLine(canvas, 19, 57, 127, 57, self.grey)
 
         for x in range(len(self.electricity_prices.prices) - 1):
             p1 = self.electricity_prices.prices[x]
