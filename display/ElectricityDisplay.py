@@ -29,9 +29,9 @@ class ElectricityDisplay(Display):
         graphics.DrawLine(canvas, 20, 15, 127, 15, self.grey)
         graphics.DrawText(canvas, self.font_thumb, 0, 33, self.purple, f'{self.electricity_prices.min_price+2*price_delta/4:.1f}')
         graphics.DrawLine(canvas, 20, 29, 127, 29, self.grey)
-        graphics.DrawText(canvas, self.font_thumb, 0, 47, self.purple, f'{self.electricity_prices.min_price+1*price_delta/4:.1f}')
+        graphics.DrawText(canvas, self.font_thumb, 0, 46, self.purple, f'{self.electricity_prices.min_price+1*price_delta/4:.1f}')
         graphics.DrawLine(canvas, 20, 43, 127, 43, self.grey)
-        graphics.DrawText(canvas, self.font_thumb, 0, 61, self.purple, f'{self.electricity_prices.min_price:.1f}')
+        graphics.DrawText(canvas, self.font_thumb, 0, 60, self.purple, f'{self.electricity_prices.min_price:.1f}')
         graphics.DrawLine(canvas, 20, 57, 127, 57, self.grey)
 
         for x in range(len(self.electricity_prices.prices) - 1):
