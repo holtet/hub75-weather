@@ -14,10 +14,10 @@ class IndoorDisplay(Display):
         self.config = config
         self.collection = collection
         self.logger = logging.getLogger(__name__)
-        self.home_image = Image.open("../images/heart_house_24.bmp").convert('RGB')
+        self.home_image = Image.open("images/heart_house_24.bmp").convert('RGB')
 
         self.weather_icons = {}
-        dir_path = '../images/weather'
+        dir_path = 'images/weather'
         for path in os.listdir(dir_path):
             # check if current path is a file
             join = os.path.join(dir_path, path)
