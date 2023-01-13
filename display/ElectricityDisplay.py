@@ -34,6 +34,8 @@ class ElectricityDisplay(Display):
         graphics.DrawText(canvas, self.font_thumb, 0, 60, self.purple, f'{self.electricity_prices.min_price:.1f}')
         graphics.DrawLine(canvas, 20, 57, 127, 57, self.grey)
 
+        graphics.DrawLine(canvas, self.config.zs_width, 0, self.config.zs_width, 56, self.grey)
+
         for x in range(len(self.electricity_prices.prices) - 1):
             p1 = self.electricity_prices.prices[x]
             p2 = self.electricity_prices.prices[x + 1]
