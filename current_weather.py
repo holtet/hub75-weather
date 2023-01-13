@@ -54,17 +54,17 @@ class CurrentWeatherFetcher:
         except Exception as e:
             self.logger.error('Fetching current weather failed: %s', str(e))
             raise
-        self.read_icon(new_weather_data)
+        # self.read_icon(new_weather_data)
         self.collection.current_weather_data = new_weather_data
 
     @staticmethod
     def to_float_str(inputstr):
         return str(round(float(inputstr), 1))
 
-    def read_icon(self, weather_data: CurrentWeatherData):
-        # print(f'Loading icon {cwd.icon}.bmp')
-        try:
-            weather_data.weather_icon = Image.open(f'{weather_data.icon}.bmp').convert('RGB')
-        except IOError:
-            self.logger.error('Icon %s not found', {weather_data.icon})
-            weather_data.weather_icon = Image.open('unknown.bmp').convert('RGB')
+    # def read_icon(self, weather_data: CurrentWeatherData):
+    #     # print(f'Loading icon {cwd.icon}.bmp')
+    #     try:
+    #         weather_data.weather_icon = Image.open(f'{weather_data.icon}.bmp').convert('RGB')
+    #     except IOError:
+    #         self.logger.error('Icon %s not found', {weather_data.icon})
+    #         weather_data.weather_icon = Image.open('unknown.bmp').convert('RGB')
