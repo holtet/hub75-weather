@@ -25,11 +25,14 @@ class ElectricityDisplay(Display):
 
         graphics.DrawText(canvas, self.font_thumb, 0, 5, self.purple, f'{self.electricity_prices.max_price:.1f}')
         graphics.DrawLine(canvas, 20, 0, 127, 0, self.grey)
-        graphics.DrawText(canvas, self.font_thumb, 0, 19, self.purple, f'{self.electricity_prices.min_price+3*price_delta/4:.1f}')
+        graphics.DrawText(canvas, self.font_thumb, 0, 19, self.purple,
+                          f'{self.electricity_prices.min_price + 3 * price_delta / 4:.1f}')
         graphics.DrawLine(canvas, 20, 15, 127, 15, self.grey)
-        graphics.DrawText(canvas, self.font_thumb, 0, 33, self.purple, f'{self.electricity_prices.min_price+2*price_delta/4:.1f}')
+        graphics.DrawText(canvas, self.font_thumb, 0, 33, self.purple,
+                          f'{self.electricity_prices.min_price + 2 * price_delta / 4:.1f}')
         graphics.DrawLine(canvas, 20, 29, 127, 29, self.grey)
-        graphics.DrawText(canvas, self.font_thumb, 0, 46, self.purple, f'{self.electricity_prices.min_price+1*price_delta/4:.1f}')
+        graphics.DrawText(canvas, self.font_thumb, 0, 46, self.purple,
+                          f'{self.electricity_prices.min_price + 1 * price_delta / 4:.1f}')
         graphics.DrawLine(canvas, 20, 43, 127, 43, self.grey)
         graphics.DrawText(canvas, self.font_thumb, 0, 60, self.purple, f'{self.electricity_prices.min_price:.1f}')
         graphics.DrawLine(canvas, 20, 57, 127, 57, self.grey)
@@ -53,19 +56,22 @@ class ElectricityDisplay(Display):
 
             if hour == current_hour:
                 #               self.logger.info("circle %s,%s", x1pos, y1pos)
-                graphics.DrawCircle(canvas, x1pos, y1pos, 2, self.white)
+                x1circlepos = x1pos
+                if self.config.width-x1circlepos<3:
+                    x1circlepos = self.config.width-3
+                graphics.DrawCircle(canvas, x1circlepos, y1pos, 2, self.white)
 
                 text = str(round(float(p1.price_nok), 1))
 
-                x1textpos = x1pos + 2 # Lage noe så den havner i midten av en rute?
+                x1textpos = x1pos + 0  # Lage noe så den havner i midten av en rute?
                 if self.config.width - x1textpos < 12:
                     x1textpos = self.config.width - 12
-                if x1textpos < 20:
-                    x1textpos = 20  # Skal vel ikke skje
+                # if x1textpos < 20:
+                #     x1textpos = 20  # Skal vel ikke skje
 
                 if y1pos > self.config.height / 2:
                     # self.logger.info("text above at %s,%s %s", x1textpos, y1pos - 15, text)
-                    graphics.DrawText(canvas, self.font_thumb, x1textpos, y1pos - 15, self.purple, f'{text}')
+                    graphics.DrawText(canvas, self.font_thumb, x1textpos, y1pos - 10, self.purple, f'{text}')
                 else:
                     # self.logger.info("text below at %s,%s %s", x1textpos, y1pos + 15, text)
                     graphics.DrawText(canvas, self.font_thumb, x1textpos, y1pos + 15, self.purple, f'{text}')

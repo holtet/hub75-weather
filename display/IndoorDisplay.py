@@ -26,8 +26,8 @@ class IndoorDisplay(Display):
 
     def display(self, canvas):
         graphics.DrawLine(canvas, 0, 6, self.config.zs_width, 6, self.grey)
-        graphics.DrawLine(canvas, 60, 7, 60, 55, self.grey)
-        graphics.DrawLine(canvas, 0, 55, self.config.zs_width, 55, self.grey)
+        graphics.DrawLine(canvas, 60, 7, 60, 54, self.grey)
+        graphics.DrawLine(canvas, 0, 54, self.config.zs_width, 54, self.grey)
         graphics.DrawText(canvas, self.font_5x7, 2, 5, self.light_blue, f'{self.collection.datetime}')
         indoor = self.collection.indoor_environment_data
         outdoor = self.collection.current_weather_data

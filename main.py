@@ -40,8 +40,8 @@ if __name__ == "__main__":
     electricity_job = scheduler.add_job(electricity.run,
                                         trigger='interval',
                                         seconds=electricity.interval(),
-                                        id=electricity.job_id())
-    joblist[electricity.job_id()] = Job(electricity_job, electricity.interval(), 600)
+                                        id=EF_JOB_ID)
+    joblist[EF_JOB_ID] = Job(electricity_job, electricity.interval(), 600)
     # Lag metode for start+add jobb
 
     wff = WeatherForecastFetcher(dataCollection, config)
