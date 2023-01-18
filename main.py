@@ -18,7 +18,7 @@ from listener import Listener
 from news import NewsFetcher
 from weather_forecast import WeatherForecastFetcher
 
-logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s %(message)s', level=logging.WARNING)
 
 # Main function
 if __name__ == "__main__":
