@@ -38,10 +38,10 @@ class LedDisplayThread(Thread):
 
         offscreen_canvas = matrix.CreateFrameCanvas()
 
-        electricity_display = ElectricityDisplay(self.config, self.collection.electricity_prices)
+        electricity_display = ElectricityDisplay(self.config, self.collection)
         indoor_display = IndoorDisplay(self.config, self.collection)
-        train_display = TrainDisplay(self.config, self.collection.departure_list)
-        news_display = NewsDisplay(self.config, self.collection.news_list)
+        train_display = TrainDisplay(self.config, self.collection)
+        news_display = NewsDisplay(self.config, self.collection)
         forecast_display = ForecastDisplay(self.config, self.collection)
 
         while True:

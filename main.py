@@ -20,11 +20,21 @@ from weather_forecast import WeatherForecastFetcher
 
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s %(message)s', level=logging.INFO)
 
+
+def start_job(job: AbstractJob):
+    job.run()
+    job_job = scheduler.add_job(job.run,
+                                trigger='interval',
+                                seconds=job.interval(),
+                                id=job.job_id())
+    joblist[job.job_id()] = Job(job_job, job.interval(), 600)
+
+
 # Main function
 if __name__ == "__main__":
-    configp = configparser.ConfigParser()
-    configp.read('config.ini')
-    config = Config(configp)
+    config_parser = configparser.ConfigParser()
+    config_parser.read('config.ini')
+    config = Config(config_parser)
 
     dataCollection = DataCollection()
 
@@ -36,12 +46,13 @@ if __name__ == "__main__":
     joblist = {}
 
     electricity: AbstractJob = ElectricityFetcher(dataCollection)
-    electricity.run()
-    electricity_job = scheduler.add_job(electricity.run,
-                                        trigger='interval',
-                                        seconds=electricity.interval(),
-                                        id=EF_JOB_ID)
-    joblist[EF_JOB_ID] = Job(electricity_job, electricity.interval(), 600)
+    start_job(electricity)
+    # electricity.run()
+    # electricity_job = scheduler.add_job(electricity.run,
+    #                                     trigger='interval',
+    #                                     seconds=electricity.interval(),
+    #                                     id=electricity.job_id())
+    # joblist[electricity.job_id()] = Job(electricity_job, electricity.interval(), 600)
     # Lag metode for start+add jobb
 
     wff = WeatherForecastFetcher(dataCollection, config)
