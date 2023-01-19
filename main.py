@@ -18,7 +18,7 @@ from listener import Listener
 from news import NewsFetcher
 from weather_forecast import WeatherForecastFetcher
 
-logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s %(message)s', level=logging.WARNING)
 
 
 def start_job(job: AbstractJob):
