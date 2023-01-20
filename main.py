@@ -9,13 +9,13 @@ from coordinator import Coordinator
 from jobs.current_weather import CurrentWeatherFetcher
 from dto import *
 from jobs.entur import TrainDepartureFetcher
-from indoor_environment import IndoorEnvironmentFetcher
+from jobs.indoor_environment import IndoorEnvironmentFetcher
 from jobs.Job import AbstractJob
 from jobs.electricity import ElectricityFetcher
 from led_display import LedDisplayThread
 from listener import Listener
 from jobs.news import NewsFetcher
-from weather_forecast import WeatherForecastFetcher
+from jobs.weather_forecast import WeatherForecastFetcher
 
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s %(message)s', level=logging.WARNING)
 
@@ -54,9 +54,10 @@ if __name__ == "__main__":
     # joblist[electricity.job_id()] = Job(electricity_job, electricity.interval(), 600)
 
     wff = WeatherForecastFetcher(dataCollection, config)
-    wff.run()
-    wff_job = scheduler.add_job(wff.run, trigger='interval', seconds=3600, id=WFF_JOB_ID)
-    joblist[WFF_JOB_ID] = Job(wff_job, 3600, 600)
+    start_job(wff)
+    # wff.run()
+    # wff_job = scheduler.add_job(wff.run, trigger='interval', seconds=3600, id=WFF_JOB_ID)
+    # joblist[WFF_JOB_ID] = Job(wff_job, 3600, 600)
 
     tdf = TrainDepartureFetcher(dataCollection, config)
     start_job(tdf)
@@ -71,9 +72,10 @@ if __name__ == "__main__":
     # joblist[CWF_JOB_ID] = Job(cwf_job, 3600, 600)
 
     ief = IndoorEnvironmentFetcher(dataCollection)
-    ief.run()
-    ief_job = scheduler.add_job(ief.run, trigger='interval', seconds=2, id=IEF_JOB_ID)
-    joblist[IEF_JOB_ID] = Job(ief_job, 2, 2)
+    start_job(ief)
+    # ief.run()
+    # ief_job = scheduler.add_job(ief.run, trigger='interval', seconds=2, id=IEF_JOB_ID)
+    # joblist[IEF_JOB_ID] = Job(ief_job, 2, 2)
 
     news_fetcher = NewsFetcher(dataCollection, config)
     start_job(news_fetcher)

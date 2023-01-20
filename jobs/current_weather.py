@@ -7,17 +7,6 @@ from jobs.jobexception import JobException
 
 
 class CurrentWeatherFetcher(AbstractJob):
-    @staticmethod
-    def interval() -> int:
-        return 3600
-
-    @staticmethod
-    def retry_interval() -> int:
-        return 600
-
-    @staticmethod
-    def job_id():
-        return 'weather_job_id'
 
     def __init__(self, collection: DataCollection, config: Config):
         self.collection = collection
@@ -69,3 +58,15 @@ class CurrentWeatherFetcher(AbstractJob):
     @staticmethod
     def to_float_str(inputstr):
         return str(round(float(inputstr), 1))
+
+    @staticmethod
+    def interval() -> int:
+        return 3600
+
+    @staticmethod
+    def retry_interval() -> int:
+        return 600
+
+    @staticmethod
+    def job_id():
+        return 'weather_job_id'

@@ -4,20 +4,21 @@ from datetime import datetime
 
 from config import Config
 from dto import *
+from jobs.Job import AbstractJob
+from jobs.jobexception import JobException
 
-class WeatherForecastFetcher:
+
+class WeatherForecastFetcher(AbstractJob):
 
     def __init__(self, collection: DataCollection, config: Config):
         self.collection = collection
-        self.OWM_str = f'http://api.openweathermap.org/data/2.5/forecast?id={config.weather_city_id}&appid={config.weather_api_key}'
+        self.OWM_str = f'{config.weather_url}{config.weather_city_id}&appid={config.weather_api_key}'
         self.logger = logging.getLogger(__name__)
 
     def run(self):
         try:
             self.logger.info("Fetching weather forecast")
             response = requests.get(self.OWM_str).json()
-            # print(response.content)
-            # response2 = response.json()
             if response['cod'] != '404':
                 self.collection.forecast_list = []
                 forecasts = response['list']
@@ -38,7 +39,18 @@ class WeatherForecastFetcher:
                     fore.set_detail_text()
                     self.collection.forecast_list.append(fore)
             else:
-                raise Exception("Weather forecast not found")
+                raise JobException("Weather forecast not found")
         except Exception as e:
-            self.logger.error('Weather forecast fetcher failed: %s', str(e))
-            raise e
+            raise JobException(f'Weather forecast fetcher failed: {str(e)}')
+
+    @staticmethod
+    def interval() -> int:
+        return 3600
+
+    @staticmethod
+    def retry_interval() -> int:
+        return 600
+
+    @staticmethod
+    def job_id():
+        return 'forecast_job_id'

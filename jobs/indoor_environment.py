@@ -5,8 +5,11 @@ import smbus2
 from apds9960 import APDS9960
 
 from dto import *
+from jobs.Job import AbstractJob
+from jobs.jobexception import JobException
 
-class IndoorEnvironmentFetcher:
+
+class IndoorEnvironmentFetcher(AbstractJob):
     PORT = 1  # i2c port
     ADDRESS = 0x76  # Adafruit BME280 address. Other BME280s may be different
 
@@ -36,8 +39,7 @@ class IndoorEnvironmentFetcher:
                 new_env_data.temperature = bme280_data.temperature
                 self.collection.indoor_environment_data = new_env_data
             except Exception as e:
-                self.logger.error('Failed to fetch indoor environment: %s', str(e))
-                raise Exception('Failed to fetch indoor environment')
+                raise JobException(f'Failed to fetch indoor environment {str(e)}')
             try:
                 self.collection.ambient_light = self.apds.readAmbientLight()
                 #                if apds.isGestureAvailable():
@@ -49,5 +51,16 @@ class IndoorEnvironmentFetcher:
                 # elif (motion == APDS9960_DIR_DOWN):
                 #     new_env_data.time_offset -= 15
             except Exception as e:
-                self.logger.error('Failed to fetch brightness: %s', str(e))
-                raise Exception('Failed to fetch brightness')
+                raise JobException(f'Failed to fetch brightness {str(e)}')
+
+    @staticmethod
+    def interval() -> int:
+        return 2
+
+    @staticmethod
+    def retry_interval() -> int:
+        return 2
+
+    @staticmethod
+    def job_id():
+        return 'weather_job_id'
