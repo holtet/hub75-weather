@@ -1,5 +1,5 @@
 import configparser
-from news import NewsFetcher
+from jobs.news import NewsFetcher
 from dto import *
 from config import Config
 

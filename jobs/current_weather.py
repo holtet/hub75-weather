@@ -1,15 +1,27 @@
 import logging
 import requests
-from PIL import Image
 from dto import *
 from config import Config
+from jobs.Job import AbstractJob
+from jobs.jobexception import JobException
 
 
-class CurrentWeatherFetcher:
+class CurrentWeatherFetcher(AbstractJob):
+    @staticmethod
+    def interval() -> int:
+        return 3600
+
+    @staticmethod
+    def retry_interval() -> int:
+        return 600
+
+    @staticmethod
+    def job_id():
+        return 'weather_job_id'
 
     def __init__(self, collection: DataCollection, config: Config):
         self.collection = collection
-        self.OWM_str = f'http://api.openweathermap.org/data/2.5/weather?id={config.weather_city_id}&appid={config.weather_api_key}'
+        self.OWM_str = f'{config.weather_url}{config.weather_city_id}&appid={config.weather_api_key}'
         self.logger = logging.getLogger(__name__)
 
     def run(self):
@@ -49,22 +61,11 @@ class CurrentWeatherFetcher:
                 new_weather_data.set_header_text()
                 new_weather_data.set_detail_text2()
             else:
-                self.logger.error("Current weather not found")
-                raise Exception("Current weather not found")
+                raise JobException("Current weather not found")
         except Exception as e:
-            self.logger.error('Fetching current weather failed: %s', str(e))
-            raise
-        # self.read_icon(new_weather_data)
+            raise JobException(f'Fetching current weather failed: {str(e)}')
         self.collection.current_weather_data = new_weather_data
 
     @staticmethod
     def to_float_str(inputstr):
         return str(round(float(inputstr), 1))
-
-    # def read_icon(self, weather_data: CurrentWeatherData):
-    #     # print(f'Loading icon {cwd.icon}.bmp')
-    #     try:
-    #         weather_data.weather_icon = Image.open(f'{weather_data.icon}.bmp').convert('RGB')
-    #     except IOError:
-    #         self.logger.error('Icon %s not found', {weather_data.icon})
-    #         weather_data.weather_icon = Image.open('unknown.bmp').convert('RGB')

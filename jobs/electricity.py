@@ -14,6 +14,10 @@ class ElectricityFetcher(AbstractJob):
         return 3600
 
     @staticmethod
+    def retry_interval() -> int:
+        return 600
+
+    @staticmethod
     def job_id():
         return 'electricity_job_id'
 

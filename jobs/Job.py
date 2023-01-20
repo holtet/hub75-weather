@@ -8,4 +8,8 @@ class AbstractJob:
 
     @staticmethod
     def interval() -> int:
-        pass
+        return 3600
+
+    @staticmethod
+    def retry_interval() -> int:
+        return 600

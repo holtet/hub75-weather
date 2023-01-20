@@ -5,9 +5,10 @@ from enturclient import EnturPublicTransportData
 
 from config import Config
 from dto import *
+from jobs.Job import AbstractJob
 
 
-class TrainDepartureFetcher:
+class TrainDepartureFetcher(AbstractJob):
 
     def __init__(self, collection: DataCollection, config1: Config):
         self.collection = collection
@@ -37,18 +38,26 @@ class TrainDepartureFetcher:
             await data.update()
 
             train = data.get_stop_info(stop_id)
-            dindex = 0
+            departure_index = 0
             for index, call in enumerate(train.estimated_calls):
                 print(f'|{call.front_display}|')
-                #                for d in self.destinations:
-                #                    print(f'destination: |{d}|')
-                if dindex < self.config.max_train_departures and call.front_display in self.config.destinations:  # or (1 == 1):
-                    old_pos = self.collection.departure_list[dindex].pos
+                if departure_index < self.config.max_train_departures and call.front_display in self.config.destinations:  # or (1 == 1):
+                    old_pos = self.collection.departure_list[departure_index].pos
                     departure = Departure(call.front_display, call.aimed_departure_time, call.delay_in_min, old_pos)
-                    self.collection.departure_list[dindex] = departure
-                    dindex += 1
-            #                else:
-            #                    print(f'Skipped train departure |{call.front_display}|, dindex {dindex}')
-            while dindex < self.config.max_train_departures:
-                self.collection.departure_list[dindex] = Departure("", "", 0, 0)
-                dindex += 1
+                    self.collection.departure_list[departure_index] = departure
+                    departure_index += 1
+            while departure_index < self.config.max_train_departures:
+                self.collection.departure_list[departure_index] = Departure("", "", 0, 0)
+                departure_index += 1
+
+    @staticmethod
+    def interval() -> int:
+        return 300
+
+    @staticmethod
+    def retry_interval() -> int:
+        return 150
+
+    @staticmethod
+    def job_id():
+        return 'entur_job_id'

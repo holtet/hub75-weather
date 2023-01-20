@@ -10,6 +10,7 @@ class Config:
         self.height = 64
         self.zs_height = self.height - 1
 
+        self.weather_url = config["WEATHER"]["url"]
         self.weather_api_key = config["WEATHER"]["apiKey"]
         self.weather_city_id = config["WEATHER"]["cityId"]
 
@@ -18,20 +19,22 @@ class Config:
         self.stop_id = config["TRAINS"]["stopId"]
         self.max_train_departures = config["TRAINS"].get("maxTrainDepartures", 8)
 
+        self.news_url = config["NEWS"]["url"]
+
         self.time_periods = []
         self.range_re = re.compile(r"\d+-\d+")
 
         for layout_name in list(filter(lambda x: str(x).startswith("SCREEN_"), config.sections())):
             print(f'found layout config {layout_name}')
             times = list(map(int, str(config[layout_name]["times"]).split(",")))
-            for l in str(config[layout_name]["active"]).split("\n"):
+            for cron_line in str(config[layout_name]["active"]).split("\n"):
                 time_period = TimePeriod(layout_name, times)
-                p = l.split(" ")
-                time_period.minutes = self.conf_to_array(str(p[0]))
-                time_period.hours = self.conf_to_array(str(p[1]))
-                time_period.weekdays = self.conf_to_array(str(p[2]))
-                time_period.days = self.conf_to_array(str(p[3]))
-                time_period.months = self.conf_to_array(str(p[4]))
+                cron_parts = cron_line.split(" ")
+                time_period.minutes = self.conf_to_array(str(cron_parts[0]))
+                time_period.hours = self.conf_to_array(str(cron_parts[1]))
+                time_period.weekdays = self.conf_to_array(str(cron_parts[2]))
+                time_period.days = self.conf_to_array(str(cron_parts[3]))
+                time_period.months = self.conf_to_array(str(cron_parts[4]))
                 self.time_periods.append(time_period)
 
     def conf_to_array(self, conf_str):
