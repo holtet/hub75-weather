@@ -7,7 +7,7 @@ from apds9960 import APDS9960
 from dt.data_collection import DataCollection
 from dt.indoor_environment_data import IndoorEnvironmentData
 from jobs.abstract_job import AbstractJob
-from jobs.jobexception import JobException
+from jobs.job_exception import JobException
 
 
 class IndoorEnvironmentFetcher(AbstractJob):

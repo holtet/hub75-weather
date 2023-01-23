@@ -1,7 +1,7 @@
 import configparser
 
 from dt.data_collection import DataCollection
-from jobs.news import NewsFetcher
+from jobs.news_fetcher import NewsFetcher
 from config import Config
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ from dt.data_collection import DataCollection
 # from dto import *
 # from dt.electricity_prices import ElectricityPrices
 from config import Config
-from jobs.electricity import ElectricityFetcher
+from jobs.electricity_fetcher import ElectricityFetcher
 import configparser
 
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s %(message)s', level=logging.INFO)

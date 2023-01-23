@@ -10,9 +10,9 @@ class ElectricityPrices:
     max_price: float
     min_price: float
 
-    def __init__(self):
-        self.prices = []
-        self.prices_today = []
-        self.prices_tomorrow = []
-        self.max_price = 0.0
-        self.min_price = 0.0
+    # def __init__(self):
+        # self.prices = []
+        # self.prices_today = []
+        # self.prices_tomorrow = []
+        # self.max_price = 0.0
+        # self.min_price = 0.0

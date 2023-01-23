@@ -7,10 +7,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from dt.data_collection import DataCollection
 from dt.time_period import TimePeriod
 from config import Config
-from jobs.current_weather import CurrentWeatherFetcher
-from jobs.entur import TrainDepartureFetcher
-from jobs.news import NewsFetcher
-from jobs.weather_forecast import WeatherForecastFetcher
+from jobs.current_weather_fetcher import CurrentWeatherFetcher
+from jobs.entur_fetcher import TrainDepartureFetcher
+from jobs.news_fetcher import NewsFetcher
+from jobs.weather_forecast_fetcher import WeatherForecastFetcher
 
 
 class Coordinator(Thread):

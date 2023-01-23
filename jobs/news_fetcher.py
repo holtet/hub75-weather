@@ -4,7 +4,7 @@ from dt.data_collection import DataCollection
 from config import Config
 from dt.news_item import NewsItem
 from jobs.abstract_job import AbstractJob
-from jobs.jobexception import JobException
+from jobs.job_exception import JobException
 
 
 class NewsFetcher(AbstractJob):

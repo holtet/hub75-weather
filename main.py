@@ -8,16 +8,16 @@ from config import Config
 from coordinator import Coordinator
 from dt.data_collection import DataCollection
 from dt.job import Job
-from jobs.current_weather import CurrentWeatherFetcher
-from jobs.entur import TrainDepartureFetcher
-from jobs.indoor_environment import IndoorEnvironmentFetcher
+from jobs.current_weather_fetcher import CurrentWeatherFetcher
+from jobs.entur_fetcher import TrainDepartureFetcher
+from jobs.indoor_environment_fetcher import IndoorEnvironmentFetcher
 from jobs.abstract_job import AbstractJob
-from jobs.electricity import ElectricityFetcher
-from jobs.jobexception import JobException
+from jobs.electricity_fetcher import ElectricityFetcher
+from jobs.job_exception import JobException
 from led_display import LedDisplayThread
 from listener import Listener
-from jobs.news import NewsFetcher
-from jobs.weather_forecast import WeatherForecastFetcher
+from jobs.news_fetcher import NewsFetcher
+from jobs.weather_forecast_fetcher import WeatherForecastFetcher
 import traceback
 
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s %(message)s', level=logging.WARNING)
@@ -52,11 +52,9 @@ if __name__ == "__main__":
     scheduler = BackgroundScheduler(job_defaults=job_defaults)
     joblist = {}
 
-    electricity: AbstractJob = ElectricityFetcher(dataCollection)
-    start_job(electricity)
+    start_job(ElectricityFetcher(dataCollection))
 
-    wff = WeatherForecastFetcher(dataCollection, config)
-    start_job(wff)
+    start_job(WeatherForecastFetcher(dataCollection, config))
 
     tdf = TrainDepartureFetcher(dataCollection, config)
     start_job(tdf)

@@ -4,8 +4,8 @@ from rgbmatrix import graphics
 class Display:
     # rød og blå er byttet
     black = graphics.Color(0, 0, 0)
-    light_blue = graphics.Color(127, 0, 0)
-    dark_blue = graphics.Color(32, 0, 0)
+    light_blue = graphics.Color(192, 64, 64)
+    dark_blue = graphics.Color(96, 16, 16)
     purple = graphics.Color(84, 65, 28)
     purple2 = graphics.Color(78, 0, 78)
     green = graphics.Color(0, 127, 0)

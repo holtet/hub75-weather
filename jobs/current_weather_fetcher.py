@@ -5,7 +5,7 @@ from dt.current_weather_data import CurrentWeatherData
 from dt.data_collection import DataCollection
 from config import Config
 from jobs.abstract_job import AbstractJob
-from jobs.jobexception import JobException
+from jobs.job_exception import JobException
 
 
 class CurrentWeatherFetcher(AbstractJob):

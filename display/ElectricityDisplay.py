@@ -54,7 +54,7 @@ class ElectricityDisplay(Display):
         self.draw_price_graph(canvas, electricity_prices.prices_today, electricity_prices.min_price,
                               x_multiplier, price_delta, 1, self.light_blue)
         self.draw_price_graph(canvas, electricity_prices.prices_tomorrow, electricity_prices.min_price,
-                              x_multiplier, price_delta, 1, self.dark_blue)
+                              x_multiplier, price_delta, 0, self.dark_blue)
 
         # for p in electricity_prices.prices:
         #     self.logger.info("\n%s, %s", p.price_nok, datetime.strftime(p.time_start, "%H"))
