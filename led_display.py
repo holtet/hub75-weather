@@ -1,6 +1,8 @@
 import time
 
 import logging
+import traceback
+
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
 from threading import Thread
 
@@ -80,4 +82,5 @@ class LedDisplayThread(Thread):
                     time.sleep(0.03)
             except Exception as e:
                 self.logger.error('Failed to show display: %s', str(e))
+                traceback.print_exc()
                 time.sleep(3)

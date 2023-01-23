@@ -30,10 +30,9 @@ class ElectricityFetcher(AbstractJob):
         electricity_prices.max_price = max(map(lambda x: x.price_nok, electricity_prices.prices))
         electricity_prices.min_price = min(map(lambda x: x.price_nok, electricity_prices.prices))
 
-    def create_price_list(self, datestring):
+    def create_price_list(self, datestring) -> [Price]:
         url_today = f'https://www.hvakosterstrommen.no/api/v1/prices/{datestring}_NO1.json'
         self.logger.warning(f'Fetching current electricity prices for {datestring}')
-        # electricity_prices: ElectricityPrices = ElectricityPrices()
         prices: [Price] = []
         try:
             response = requests.get(url_today)

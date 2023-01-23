@@ -18,7 +18,7 @@ class ElectricityDisplay(Display):
         self.logger = logging.getLogger(__name__)
 
     def display(self, canvas):
-        electricity_prices = self.collection.electricity_prices_today
+        electricity_prices: ElectricityPrices = self.collection.electricity_prices
         price_delta = electricity_prices.max_price - electricity_prices.min_price
         x_multiplier = (self.config.width - 20) / len(electricity_prices.prices_today)
 
@@ -65,8 +65,8 @@ class ElectricityDisplay(Display):
         current_hour = int(datetime.today().strftime("%H"))
 
         for x in range(len(electricity_prices) - 1):
-            p1 = electricity_prices.prices[x]
-            p2 = electricity_prices.prices[x + 1]
+            p1 = electricity_prices[x]
+            p2 = electricity_prices[x + 1]
             hour = int(datetime.strftime(p1.time_start, "%H"))
             x1pos = round(x * x_multiplier) + 20
             y1pos = round(self.config.height - 8 - ((p1.price_nok - min_price) * y_multiplier))

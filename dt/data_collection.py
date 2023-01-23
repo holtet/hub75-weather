@@ -15,7 +15,7 @@ class DataCollection:
         self.current_screen_time = 0
         self.indoor_environment_data = IndoorEnvironmentData()
         self.current_weather_data = CurrentWeatherData()
-        self.electricity_prices_today = ElectricityPrices()
+        self.electricity_prices = ElectricityPrices()
         self.departure_list = []
         self.news_list = []
         for i in range(0, 8):
