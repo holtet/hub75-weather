@@ -18,6 +18,7 @@ from led_display import LedDisplayThread
 from listener import Listener
 from jobs.news import NewsFetcher
 from jobs.weather_forecast import WeatherForecastFetcher
+import traceback
 
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(name)s %(message)s', level=logging.WARNING)
 
@@ -27,6 +28,7 @@ def start_job(job: AbstractJob):
         job.run()
     except JobException as e:
         print(f'Failed to run job {job.job_id()}. {e.message}')
+        traceback.print_exc()
 
     job_job = scheduler.add_job(job.run,
                                 trigger='interval',

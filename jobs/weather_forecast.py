@@ -42,7 +42,7 @@ class WeatherForecastFetcher(AbstractJob):
             else:
                 raise JobException("Weather forecast not found")
         except Exception as e:
-            raise JobException(f'Weather forecast fetcher failed: {str(e)}')
+            raise JobException(f'Weather forecast fetcher failed: {repr(e)}')
 
     @staticmethod
     def interval() -> int:
