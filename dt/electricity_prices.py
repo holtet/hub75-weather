@@ -12,5 +12,7 @@ class ElectricityPrices:
 
     def __init__(self):
         self.prices = []
+        self.prices_today = []
+        self.prices_tomorrow = []
         self.max_price = 0.0
         self.min_price = 0.0
