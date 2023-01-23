@@ -10,7 +10,8 @@ class Config:
         self.height = 64
         self.zs_height = self.height - 1
 
-        self.weather_url = config["WEATHER"]["url"]
+        self.weather_url = config["WEATHER"]["weather_url"]
+        self.forecast_url = config["WEATHER"]["forecast_url"]
         self.weather_api_key = config["WEATHER"]["apiKey"]
         self.weather_city_id = config["WEATHER"]["cityId"]
 

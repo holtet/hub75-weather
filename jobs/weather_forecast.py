@@ -13,7 +13,7 @@ class WeatherForecastFetcher(AbstractJob):
 
     def __init__(self, collection: DataCollection, config: Config):
         self.collection = collection
-        self.OWM_str = f'{config.weather_url}{config.weather_city_id}&appid={config.weather_api_key}'
+        self.OWM_str = f'{config.forecast_url}{config.weather_city_id}&appid={config.weather_api_key}'
         self.logger = logging.getLogger(__name__)
 
     def run(self):
