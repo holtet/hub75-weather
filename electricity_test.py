@@ -1,7 +1,7 @@
 import logging
 
 from display.ElectricityDisplay import ElectricityDisplay
-from dto import *
+from dt.data_collection import DataCollection
 # from dto import *
 # from dt.electricity_prices import ElectricityPrices
 from config import Config

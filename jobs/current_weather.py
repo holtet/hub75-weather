@@ -1,8 +1,10 @@
 import logging
 import requests
-from dto import *
+
+from dt.current_weather_data import CurrentWeatherData
+from dt.data_collection import DataCollection
 from config import Config
-from jobs.Job import AbstractJob
+from jobs.abstract_job import AbstractJob
 from jobs.jobexception import JobException
 
 

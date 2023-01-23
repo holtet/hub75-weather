@@ -1,9 +1,13 @@
 import logging
 import time
+from datetime import datetime
 from threading import Thread
 from apscheduler.schedulers.background import BackgroundScheduler
-from dto import *
+
+from dt.data_collection import DataCollection
+from dt.time_period import TimePeriod
 from config import Config
+
 
 class Coordinator(Thread):
     FADE_SECONDS = 2
@@ -49,9 +53,9 @@ class Coordinator(Thread):
             # On the "exact" second
             if subsecond < 0.1:
                 drift = subsecond
-                self.collection.datetime = datetime.datetime.today().strftime(self.config.datetime_format)
+                self.collection.datetime = datetime.today().strftime(self.config.datetime_format)
                 # #"%d/%m  %H:%M:%S")
-                #self.collection.datetime = datetime.datetime.today().strftime("%d/%m  %H:%M:%S")
+                # self.collection.datetime = datetime.datetime.today().strftime("%d/%m  %H:%M:%S")
             # print(f'{secs_since_rotation_start:.1f}, Screen:{current_screen}, timeCount:{time_count},
             # SSS:{secs_since_switch:.1f}, SUS:{secs_until_switch:.1f}, B:{self.collection.brightness:.1f})
 
@@ -64,7 +68,7 @@ class Coordinator(Thread):
             time.sleep(0.1 - drift / 10)
 
     def find_next_timeperiod(self):
-        t = datetime.datetime.today()
+        t = datetime.today()
         # print(f'current_screen {current_screen} max {layout.max_active_screen}')
         # print(f'min {t.minute} hour {t.hour} weekday {t.weekday()+1} day {t.day} month {t.month}')
         self.logger.warning('Current layout: %s', self.layout.layout)

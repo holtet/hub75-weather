@@ -1,7 +1,7 @@
 import time
 
 import logging
-from rgbmatrix import graphics, RGBMatrix, RGBMatrixOptions
+from rgbmatrix import RGBMatrix, RGBMatrixOptions
 from threading import Thread
 
 from config import Config
@@ -10,7 +10,7 @@ from display.ForecastDisplay import ForecastDisplay
 from display.IndoorDisplay import IndoorDisplay
 from display.NewsDisplay import NewsDisplay
 from display.TrainDisplay import TrainDisplay
-from dto import *
+from dt.data_collection import DataCollection
 
 
 class LedDisplayThread(Thread):

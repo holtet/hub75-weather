@@ -1,8 +1,8 @@
-import twitter
 import feedparser
-from dto import *
+
+from dt.data_collection import DataCollection
 from config import Config
-from jobs.Job import AbstractJob
+from jobs.abstract_job import AbstractJob
 from jobs.jobexception import JobException
 
 

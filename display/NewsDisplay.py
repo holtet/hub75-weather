@@ -5,7 +5,8 @@ from rgbmatrix import graphics
 
 from config import Config
 from display.Display import Display
-from dto import NewsItem, DataCollection
+from dt.data_collection import DataCollection
+from dt.news_item import NewsItem
 
 
 class NewsDisplay(Display):

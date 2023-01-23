@@ -4,8 +4,9 @@ import logging
 import smbus2
 from apds9960 import APDS9960
 
-from dto import *
-from jobs.Job import AbstractJob
+from dt.data_collection import DataCollection
+from dt.indoor_environment_data import IndoorEnvironmentData
+from jobs.abstract_job import AbstractJob
 from jobs.jobexception import JobException
 
 

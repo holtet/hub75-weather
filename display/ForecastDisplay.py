@@ -6,7 +6,8 @@ from rgbmatrix import graphics
 from config import Config
 from const import SCREEN_FORECAST_3
 from display.Display import Display
-from dto import NewsItem, DataCollection
+from dt.data_collection import DataCollection
+from dt.news_item import NewsItem
 
 
 class ForecastDisplay(Display):
@@ -31,7 +32,7 @@ class ForecastDisplay(Display):
         # + 3 hour
         graphics.DrawText(canvas, self.font_thumb, 0, 11, self.green,
                           f'{forecast_0.time} {forecast_0.temp}C')
-        #                graphics.DrawText(canvas, font, 0, 17, green, f'{self.collection.forecast_list[offset].weather_desc}')
+        # graphics.DrawText(canvas, font, 0, 17, green, f'{self.collection.forecast_list[offset].weather_desc}')
         detail_length1 = graphics.DrawText(canvas, self.font_thumb,
                                            forecast_0.detail_text.pos, 17, self.green,
                                            f'{forecast_0.detail_text.text}')
@@ -42,7 +43,7 @@ class ForecastDisplay(Display):
         forecast_2 = self.collection.forecast_list[offset + 2]
         graphics.DrawText(canvas, self.font_thumb, 0, 25, self.green,
                           f'{forecast_2.time} {forecast_2.temp}C')
-        #                graphics.DrawText(canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
+        # graphics.DrawText(canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
         detail_length2 = graphics.DrawText(canvas, self.font_thumb,
                                            forecast_2.detail_text.pos, 31,
                                            self.green,
@@ -54,7 +55,7 @@ class ForecastDisplay(Display):
         forecast_4 = self.collection.forecast_list[offset + 4]
         graphics.DrawText(canvas, self.font_thumb, 0, 39, self.green,
                           f'{forecast_4.time} {forecast_4.temp}C')
-        #                graphics.DrawText(canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
+        # graphics.DrawText(canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
         detail_length3 = graphics.DrawText(canvas, self.font_thumb,
                                            forecast_4.detail_text.pos, 45,
                                            self.green,
@@ -66,7 +67,7 @@ class ForecastDisplay(Display):
         forecast_6 = self.collection.forecast_list[offset + 6]
         graphics.DrawText(canvas, self.font_thumb, 0, 53, self.green,
                           f'{forecast_6.time} {forecast_6.temp}C')
-        #                graphics.DrawText(canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
+        # graphics.DrawText(canvas, font, 0, 31, green, f'{self.collection.forecast_list[offset+2].weather_desc}')
         detail_length4 = graphics.DrawText(canvas, self.font_thumb,
                                            forecast_6.detail_text.pos, 59,
                                            self.green,

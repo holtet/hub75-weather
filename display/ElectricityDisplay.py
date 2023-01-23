@@ -6,7 +6,7 @@ from rgbmatrix import graphics
 from config import Config
 from display.Display import Display
 from dt.electricity_prices import ElectricityPrices
-from dto import DataCollection
+from dt.data_collection import DataCollection
 
 
 class ElectricityDisplay(Display):

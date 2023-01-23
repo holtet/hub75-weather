@@ -5,7 +5,8 @@ from rgbmatrix import graphics
 
 from config import Config
 from display.Display import Display
-from dto import Departure, DataCollection
+from dt.data_collection import DataCollection
+from dt.departure import Departure
 
 
 class TrainDisplay(Display):

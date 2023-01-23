@@ -4,8 +4,9 @@ import logging
 from enturclient import EnturPublicTransportData
 
 from config import Config
-from dto import *
-from jobs.Job import AbstractJob
+from dt.data_collection import DataCollection
+from dt.departure import Departure
+from jobs.abstract_job import AbstractJob
 
 
 class TrainDepartureFetcher(AbstractJob):

@@ -1,5 +1,5 @@
 import re
-from dto import TimePeriod
+from dt.time_period import TimePeriod
 
 
 class Config:

@@ -3,8 +3,9 @@ import requests
 from datetime import datetime
 
 from config import Config
-from dto import *
-from jobs.Job import AbstractJob
+from dt.data_collection import DataCollection
+from dt.forecast import Forecast
+from jobs.abstract_job import AbstractJob
 from jobs.jobexception import JobException
 
 
@@ -24,7 +25,7 @@ class WeatherForecastFetcher(AbstractJob):
                 forecasts = response['list']
                 for forecast in forecasts:
                     fore = Forecast()
-                    dt = datetime.datetime.fromtimestamp(forecast['dt'])
+                    dt = datetime.fromtimestamp(forecast['dt'])
                     fore.weekday = dt.strftime('%a %d/%m')
                     fore.time = dt.strftime('%H:%M')
                     main = forecast['main']
