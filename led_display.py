@@ -5,6 +5,7 @@ from rgbmatrix import RGBMatrix, RGBMatrixOptions
 from threading import Thread
 
 from config import Config
+from const import *
 from display.ElectricityDisplay import ElectricityDisplay
 from display.ForecastDisplay import ForecastDisplay
 from display.IndoorDisplay import IndoorDisplay

@@ -11,18 +11,6 @@ from jobs.abstract_job import AbstractJob
 
 class ElectricityFetcher(AbstractJob):
 
-    @staticmethod
-    def interval() -> int:
-        return 3600
-
-    @staticmethod
-    def retry_interval() -> int:
-        return 600
-
-    @staticmethod
-    def job_id():
-        return 'electricity_job_id'
-
     def __init__(self, collection: DataCollection):
         self.collection = collection
         self.logger = logging.getLogger(__name__)
@@ -50,3 +38,15 @@ class ElectricityFetcher(AbstractJob):
             self.logger.error('Fetching current prices failed: %s', str(e))
             raise
         self.collection.electricity_prices = electricity_prices
+
+    @staticmethod
+    def interval() -> int:
+        return 3600
+
+    @staticmethod
+    def retry_interval() -> int:
+        return 600
+
+    @staticmethod
+    def job_id():
+        return 'electricity_job_id'
