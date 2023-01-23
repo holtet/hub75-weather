@@ -7,6 +7,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from dt.data_collection import DataCollection
 from dt.time_period import TimePeriod
 from config import Config
+from jobs.current_weather import CurrentWeatherFetcher
+from jobs.entur import TrainDepartureFetcher
+from jobs.news import NewsFetcher
+from jobs.weather_forecast import WeatherForecastFetcher
 
 
 class Coordinator(Thread):
@@ -82,10 +86,10 @@ class Coordinator(Thread):
             if mmatch and hmatch and wdmatch and dmatch and momatch:
                 if self.layout != tp:
                     self.logger.warning('switching layout from %s to %s', self.layout.layout, tp.layout)
-                    self.check_pause_resume_job(self.layout.has_trains(), tp.has_trains(), TDF_JOB_ID)
-                    self.check_pause_resume_job(self.layout.has_forecast(), tp.has_forecast(), WFF_JOB_ID)
-                    self.check_pause_resume_job(self.layout.has_outdoor(), tp.has_outdoor(), CWF_JOB_ID)
-                    self.check_pause_resume_job(self.layout.has_news(), tp.has_news(), NF_JOB_ID)
+                    self.check_pause_resume_job(self.layout.has_trains(), tp.has_trains(), TrainDepartureFetcher.job_id())
+                    self.check_pause_resume_job(self.layout.has_forecast(), tp.has_forecast(), WeatherForecastFetcher.job_id())
+                    self.check_pause_resume_job(self.layout.has_outdoor(), tp.has_outdoor(), CurrentWeatherFetcher.job_id())
+                    self.check_pause_resume_job(self.layout.has_news(), tp.has_news(), NewsFetcher.job_id())
                     self.layout = tp
                     return
 
