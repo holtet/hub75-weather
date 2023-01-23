@@ -31,7 +31,7 @@ class IndoorDisplay(Display):
         graphics.DrawLine(canvas, 0, 6, self.config.zs_width, 6, self.grey)
         graphics.DrawLine(canvas, 60, 7, 60, 54, self.grey)
         graphics.DrawLine(canvas, 0, 54, self.config.zs_width, 54, self.grey)
-        graphics.DrawText(canvas, self.font_5x7, 2, 5, self.light_blue, f'{self.collection.datetime}')
+        graphics.DrawText(canvas, self.font_5x7, 2, 5, self.purple2, f'{self.collection.datetime}')
 
         temp_text_length = graphics.DrawText(canvas, self.font_6x12, 9, 16, self.green, f'{indoor.temperature:.1f} C')
         graphics.DrawCircle(canvas, temp_text_length - 0, 10, 1, self.green)

@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     electricity_fetcher = ElectricityFetcher(dataCollection)
     electricity_fetcher.run()
-    electricity_prices = dataCollection.electricity_prices
+    electricity_prices = dataCollection.electricity_prices_today
     logger.info("Min: %s ", electricity_prices.min_price)
     logger.info("Max: %s ", electricity_prices.max_price)
     logger.info("Size: %s ", len(electricity_prices.prices))
