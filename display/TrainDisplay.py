@@ -17,7 +17,7 @@ class TrainDisplay(Display):
         self.logger = logging.getLogger(__name__)
 
     def display(self, canvas):
-        graphics.DrawLine(canvas, 0, 1, self.config.zs_width, 1, self.dark_blue)
+        graphics.DrawLine(canvas, 0, 1, self.config.zs_width, 1, self.light_blue)
 
         for index, departure in enumerate(self.collection.departure_list, start=0):
             if departure.delay < 1:
@@ -32,7 +32,7 @@ class TrainDisplay(Display):
             graphics.DrawText(canvas, self.font_thumb, 0, y1, dep_color, departure.train_name())
             for y in range(y0, y1):
                 graphics.DrawLine(canvas, self.config.width - 19, y, self.config.zs_width, y, self.black)
-            graphics.DrawLine(canvas, self.config.width - 20, y0, self.config.width - 20, y1, self.dark_blue)
-            graphics.DrawLine(canvas, 0, y1, self.config.zs_width, y1, self.dark_blue)
+            graphics.DrawLine(canvas, self.config.width - 20, y0, self.config.width - 20, y1, self.light_blue)
+            graphics.DrawLine(canvas, 0, y1, self.config.zs_width, y1, self.light_blue)
             graphics.DrawText(canvas, self.font_thumb, self.config.width - 19, y1, dep_color,
                               departure.departure_time())
