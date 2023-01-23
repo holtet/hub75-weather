@@ -26,7 +26,7 @@ class ElectricityFetcher(AbstractJob):
                 json = response.json()
                 for value in json:
                     price = Price()
-                    price.price_nok = value['NOK_per_kWh']
+                    price.price_nok = value['NOK_per_kWh'] * 1.25
                     price.time_start = datetime.fromisoformat(value['time_start'])
                     electricity_prices.prices.append(price)
                 electricity_prices.max_price = max(map(lambda x: x.price_nok, electricity_prices.prices))
