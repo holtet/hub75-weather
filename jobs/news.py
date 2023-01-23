@@ -27,7 +27,7 @@ class NewsFetcher(AbstractJob):
         try:
             #            NewsFeed = feedparser.parse("https://www.nrk.no/toppsaker.rss")
             #            news_feed = feedparser.parse("https://www.nrk.no/osloogviken/toppsaker.rss")
-            news_feed = feedparser.parse(self.config.news_url)
+            news_feed = feedparser.parse("https://www.vg.no/rss/feed/?categories=1069%2C1070&limit=10&format=rss&private=1")
 
             for index, entry in enumerate(news_feed.entries[:8]):
                 self.collection.news_list[index] = NewsItem(f'{entry.title} - {entry.summary}')

@@ -64,4 +64,4 @@ class IndoorEnvironmentFetcher(AbstractJob):
 
     @staticmethod
     def job_id():
-        return 'weather_job_id'
+        return 'indoor_job_id'

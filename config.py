@@ -19,7 +19,7 @@ class Config:
         self.stop_id = config["TRAINS"]["stopId"]
         self.max_train_departures = config["TRAINS"].get("maxTrainDepartures", 8)
 
-        self.news_url = config["NEWS"]["url"]
+#        self.news_url = config["NEWS"]["url"]
 
         self.time_periods = []
         self.range_re = re.compile(r"\d+-\d+")
