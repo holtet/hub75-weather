@@ -48,7 +48,7 @@ class ElectricityDisplay(Display):
                 #               self.logger.info("text at %s,%s %s", x1pos, self.config.zs_height - 1, hour)
                 graphics.DrawLine(canvas, x1pos, 0, x1pos, 56, self.grey)
                 #               self.logger.info("text at %s,%s %s", x1pos, self.config.zs_height - 1, hour)
-                graphics.DrawText(canvas, self.font_thumb, x1pos, self.config.zs_height - 0, self.purple, f'{hour}')
+                graphics.DrawText(canvas, self.font_thumb, x1pos, self.config.height, self.purple, f'{hour}')
 
         if len(electricity_prices.prices_tomorrow) > 0:
             self.draw_price_graph(canvas, electricity_prices.prices_tomorrow, electricity_prices.min_price,
