@@ -13,6 +13,7 @@ from display.ForecastDisplay import ForecastDisplay
 from display.IndoorDisplay import IndoorDisplay
 from display.NewsDisplay import NewsDisplay
 from display.TrainDisplay import TrainDisplay
+from display.TrainDisplayV2 import TrainDisplayV2
 from dt.data_collection import DataCollection
 
 
@@ -43,7 +44,7 @@ class LedDisplayThread(Thread):
 
         electricity_display = ElectricityDisplay(self.config, self.collection)
         indoor_display = IndoorDisplay(self.config, self.collection)
-        train_display = TrainDisplay(self.config, self.collection)
+        train_display = TrainDisplayV2(self.config, self.collection)
         news_display = NewsDisplay(self.config, self.collection)
         forecast_display = ForecastDisplay(self.config, self.collection)
 

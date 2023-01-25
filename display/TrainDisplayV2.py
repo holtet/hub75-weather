@@ -9,7 +9,7 @@ from dt.data_collection import DataCollection
 from dt.departure import Departure
 
 
-class TrainDisplay(Display):
+class TrainDisplayV2(Display):
 
     def __init__(self, config: Config, collection: DataCollection):
         self.config = config
@@ -17,22 +17,22 @@ class TrainDisplay(Display):
         self.logger = logging.getLogger(__name__)
 
     def display(self, canvas):
-        graphics.DrawLine(canvas, 0, 1, self.config.zs_width, 1, self.light_blue)
+        graphics.DrawLine(canvas, 0, 0, self.config.zs_width, 0, self.dark_blue)
 
         for index, departure in enumerate(self.collection.departure_list, start=0):
             if departure.delay < 1:
-                dep_color = self.green
+                departure_color = self.green
             elif departure.delay < 8:
-                dep_color = self.orange
+                departure_color = self.orange
             else:
-                dep_color = self.red
+                departure_color = self.red
 
-            y0 = index * 6 + 2
+            y0 = index * 7 + 1
             y1 = y0 + 5
-            graphics.DrawText(canvas, self.font_thumb, 0, y1, dep_color, departure.train_name())
+            graphics.DrawText(canvas, self.font_4x6, 0, y1, departure_color, departure.train_name())
             for y in range(y0, y1):
                 graphics.DrawLine(canvas, self.config.width - 19, y, self.config.zs_width, y, self.black)
-            graphics.DrawLine(canvas, self.config.width - 20, y0, self.config.width - 20, y1, self.light_blue)
-            graphics.DrawLine(canvas, 0, y1, self.config.zs_width, y1, self.light_blue)
-            graphics.DrawText(canvas, self.font_thumb, self.config.width - 19, y1, dep_color,
+            graphics.DrawLine(canvas, self.config.width - 20, y0, self.config.width - 20, y1, self.dark_blue)
+            graphics.DrawLine(canvas, 0, y1, self.config.zs_width, y1, self.dark_blue)
+            graphics.DrawText(canvas, self.font_4x6, self.config.width - 19, y1, departure_color,
                               departure.departure_time())
