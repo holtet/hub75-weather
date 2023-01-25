@@ -1,4 +1,5 @@
 config.ini
+test/config-test.ini
 rpi-rgb-led-matrix
 *~
 __*

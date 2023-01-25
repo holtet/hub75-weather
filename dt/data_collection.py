@@ -1,13 +1,17 @@
 import datetime
+from typing import List
 
 from dt.current_weather_data import CurrentWeatherData
 from dt.departure import Departure
 from dt.electricity_prices import ElectricityPrices
+from dt.forecast import Forecast
 from dt.indoor_environment_data import IndoorEnvironmentData
 from dt.news_item import NewsItem
 
 
 class DataCollection:
+    forecast_list: List[Forecast]
+
     def __init__(self):
         self.brightness = 0
         self.datetime = ""
@@ -22,4 +26,4 @@ class DataCollection:
             self.departure_list.append(Departure("", datetime.time(0, 0, 0), 0, 128))
             self.news_list.append(NewsItem(""))
         self.ambient_light = 100
-        self.forecast_list = []
+        self.forecast_list: List[Forecast] = []

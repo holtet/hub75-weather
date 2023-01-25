@@ -25,6 +25,7 @@ class Coordinator(Thread):
         self.logger = logging.getLogger(__name__)
 
     def run(self):
+        logging.warning("Starting coordinator thread")
         start_time = time.perf_counter()
         drift = 0
 

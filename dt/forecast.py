@@ -2,10 +2,15 @@ from dt.scroll_text import ScrollText
 
 
 class Forecast:
+    temp: float
+    weather_desc: str
+    time: str
+    wind_speed: str
+
     def __init__(self):  # , weekday, timestr, temp, weather_desc):
         self.weekday = ''  # weekday
         self.time = ''  # timestr
-        self.temp = ''  # temp
+        self.temp = 0.0  # temp
         self.weather_desc = ''  # weather_desc
         self.detail_text = ScrollText('', 0, 0, 0)
         self.wind_speed = ''

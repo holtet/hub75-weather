@@ -47,14 +47,15 @@ class ElectricityDisplay(Display):
                 x1pos = round(x * x_multiplier) + 20
                 #               self.logger.info("text at %s,%s %s", x1pos, self.config.zs_height - 1, hour)
                 graphics.DrawLine(canvas, x1pos, 0, x1pos, 56, self.grey)
-                # if x % 3 == 0:
                 #               self.logger.info("text at %s,%s %s", x1pos, self.config.zs_height - 1, hour)
                 graphics.DrawText(canvas, self.font_thumb, x1pos, self.config.zs_height - 0, self.purple, f'{hour}')
 
+        if len(electricity_prices.prices_tomorrow) > 0:
+            self.draw_price_graph(canvas, electricity_prices.prices_tomorrow, electricity_prices.min_price,
+                                  x_multiplier, price_delta, False, self.dark_blue)
+
         self.draw_price_graph(canvas, electricity_prices.prices_today, electricity_prices.min_price,
-                              x_multiplier, price_delta, 1, self.light_blue)
-        self.draw_price_graph(canvas, electricity_prices.prices_tomorrow, electricity_prices.min_price,
-                              x_multiplier, price_delta, 0, self.dark_blue)
+                              x_multiplier, price_delta, True, self.extra_light_blue)
 
         # for p in electricity_prices.prices:
         #     self.logger.info("\n%s, %s", p.price_nok, datetime.strftime(p.time_start, "%H"))

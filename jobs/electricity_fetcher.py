@@ -7,6 +7,7 @@ from dt.data_collection import DataCollection
 from dt.electricity_prices import ElectricityPrices
 from dt.price import Price
 from jobs.abstract_job import AbstractJob
+from jobs.job_exception import JobException
 
 
 class ElectricityFetcher(AbstractJob):
@@ -16,22 +17,23 @@ class ElectricityFetcher(AbstractJob):
         self.logger = logging.getLogger(__name__)
 
     def run(self):
-        datestring_today = datetime.today().strftime("%Y/%m-%d")
-        datestring_tomorrow = (datetime.today() + timedelta(days=1)).strftime("%Y/%m-%d")
-        # url_tomorrow = f'https://www.hvakosterstrommen.no/api/v1/prices/{datestring_tomorrow}_NO1.json'
-
         electricity_prices: ElectricityPrices = ElectricityPrices()
 
-        electricity_prices.prices_today = self.create_price_list(datestring_today)
-        electricity_prices.prices_tomorrow = self.create_price_list(datestring_tomorrow)
+        datestring_today = datetime.today().strftime("%Y/%m-%d")
+        electricity_prices.prices_today = self.create_price_list(datestring_today, True)
         electricity_prices.prices.extend(electricity_prices.prices_today)
-        electricity_prices.prices.extend(electricity_prices.prices_tomorrow)
 
+        datestring_tomorrow = (datetime.today() + timedelta(days=1)).strftime("%Y/%m-%d")
+        electricity_prices.prices_tomorrow = self.create_price_list(datestring_tomorrow, False)
+        if len(electricity_prices.prices_tomorrow) == len(electricity_prices.prices_today):
+            electricity_prices.prices.extend(electricity_prices.prices_tomorrow)
+        # TODO: Flytt prices til denne klassen
         electricity_prices.max_price = max(map(lambda x: x.price_nok, electricity_prices.prices))
         electricity_prices.min_price = min(map(lambda x: x.price_nok, electricity_prices.prices))
+
         self.collection.electricity_prices = electricity_prices
 
-    def create_price_list(self, datestring) -> [Price]:
+    def create_price_list(self, datestring, raise_fault_on_not_found) -> [Price]:
         url_today = f'https://www.hvakosterstrommen.no/api/v1/prices/{datestring}_NO1.json'
         self.logger.warning(f'Fetching current electricity prices for {datestring}')
         prices: [Price] = []
@@ -44,13 +46,13 @@ class ElectricityFetcher(AbstractJob):
                     price.price_nok = value['NOK_per_kWh'] * 1.25
                     price.time_start = datetime.fromisoformat(value['time_start'])
                     prices.append(price)
-                    # electricity_prices.prices.append(price)
             else:
-                self.logger.error("Current prices not found")
-                raise Exception("Current prices not found")
+                # self.logger.error("Prices not found")
+                if raise_fault_on_not_found:
+                    raise JobException("Current prices not found")
         except Exception as e:
-            self.logger.error('Fetching current prices failed: %s', str(e))
-            raise
+            # self.logger.error('Fetching current prices failed: %s', str(e))
+            raise JobException(f'Fetching current prices failed: {str(e)}')
         return prices
 
     @staticmethod

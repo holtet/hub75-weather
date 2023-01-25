@@ -37,7 +37,7 @@ class IndoorDisplay(Display):
         graphics.DrawCircle(canvas, temp_text_length - 0, 10, 1, self.green)
         graphics.DrawText(canvas, self.font_6x12, 9, 25, self.green, f'{indoor.humidity:.1f} %')
         #                    graphics.DrawText(canvas, font2, 1, 32, green, f'{indoor.pressure:.1f} hPa')
-        canvas.SetImage(self.home_image, 13, 26)
+        canvas.SetImage(self.home_image, 14, 26)
 
         temp_text_length = graphics.DrawText(canvas, self.font_6x12, 73, 16, self.green, f'{outdoor.temperature} C')
         graphics.DrawCircle(canvas, temp_text_length + 63, 10, 1, self.green)

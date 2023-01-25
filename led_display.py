@@ -24,7 +24,7 @@ class LedDisplayThread(Thread):
         self.logger = logging.getLogger(__name__)
 
     def run(self):
-        self.logger.info("Starting display thread")
+        self.logger.warning("Starting display thread")
         height = 64
         width = 128
         options = RGBMatrixOptions()

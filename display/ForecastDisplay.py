@@ -1,5 +1,4 @@
 import logging
-from typing import List
 
 from rgbmatrix import graphics
 
@@ -7,7 +6,6 @@ from config import Config
 from const import SCREEN_FORECAST_3
 from display.Display import Display
 from dt.data_collection import DataCollection
-from dt.news_item import NewsItem
 
 
 class ForecastDisplay(Display):
