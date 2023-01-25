@@ -1,5 +1,5 @@
 import logging
-from display.ForecastDisplay2 import ForecastDisplay2
+from display.ForecastDisplayV2 import ForecastDisplayV2
 from dt.data_collection import DataCollection
 from config import Config
 import configparser
@@ -35,5 +35,5 @@ if __name__ == "__main__":
     # logger.info("Date: %s \n%s", ts, datetime.datetime.fromisoformat(ts))
     # electricity_display = ElectricityDisplay(config, dataCollection)
     # electricity_display.display(MockDisplay())
-    fd = ForecastDisplay2(config, dataCollection, MockDisplay())
+    fd = ForecastDisplayV2(config, dataCollection)
     fd.display(MockCanvas())

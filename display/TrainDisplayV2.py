@@ -29,10 +29,10 @@ class TrainDisplayV2(Display):
 
             y0 = index * 7 + 1
             y1 = y0 + 5
-            graphics.DrawText(canvas, self.font_4x6, 0, y1, departure_color, departure.train_name())
+            graphics.DrawText(canvas, self.font_5x7, 0, y1, departure_color, departure.train_name())
             for y in range(y0, y1):
-                graphics.DrawLine(canvas, self.config.width - 19, y, self.config.zs_width, y, self.black)
-            graphics.DrawLine(canvas, self.config.width - 20, y0, self.config.width - 20, y1, self.dark_blue)
+                graphics.DrawLine(canvas, self.config.width - 24, y, self.config.zs_width, y, self.black)
+            graphics.DrawLine(canvas, self.config.width - 25, y0, self.config.width - 25, y1, self.dark_blue)
             graphics.DrawLine(canvas, 0, y1, self.config.zs_width, y1, self.dark_blue)
-            graphics.DrawText(canvas, self.font_4x6, self.config.width - 19, y1, departure_color,
+            graphics.DrawText(canvas, self.font_5x7, self.config.width - 24, y1, departure_color,
                               departure.departure_time())

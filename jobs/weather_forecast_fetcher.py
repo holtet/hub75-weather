@@ -23,22 +23,23 @@ class WeatherForecastFetcher(AbstractJob):
             if response['cod'] != '404':
                 self.collection.forecast_list = []
                 forecasts = response['list']
-                for forecast in forecasts:
-                    fore = Forecast()
-                    dt = datetime.fromtimestamp(forecast['dt'])
-                    fore.weekday = dt.strftime('%a %d/%m')
-                    fore.time = dt.strftime('%H:%M')
-                    main = forecast['main']
-                    fore.temp = str(round(float(main['temp']) - 273.15, 1))
-                    fore.weather_desc = forecast['weather'][0]['description']
-                    fore.wind_speed = forecast['wind']['speed']
-                    fore.clouds = forecast['clouds']['all']
-                    if 'rain' in forecast and '3h' in forecast['rain']:
-                        fore.rain_3h = float(forecast['rain']['3h'])
-                    if 'snow' in forecast and '3h' in forecast['snow']:
-                        fore.snow_3h = float(forecast['snow']['3h'])
-                    fore.set_detail_text()
-                    self.collection.forecast_list.append(fore)
+                for forecast_json in forecasts:
+                    forecast = Forecast()
+                    dt = datetime.fromtimestamp(forecast_json['dt'])
+                    forecast.weekday = dt.strftime('%a %d/%m')
+                    forecast.time = dt.strftime('%H:%M')
+                    main = forecast_json['main']
+                    forecast.temp = str(round(float(main['temp']) - 273.15, 1))
+                    forecast.weather_desc = forecast_json['weather'][0]['description']
+                    forecast.wind_speed = forecast_json['wind']['speed']
+                    forecast.clouds = forecast_json['clouds']['all']
+                    if 'rain' in forecast_json and '3h' in forecast_json['rain']:
+                        forecast.rain_3h = float(forecast_json['rain']['3h'])
+                    if 'snow' in forecast_json and '3h' in forecast_json['snow']:
+                        forecast.snow_3h = float(forecast_json['snow']['3h'])
+                    forecast.set_detail_text()
+                    self.collection.forecast_list.append(forecast)
+                self.logger.warning(f'Found a list of {len(self.collection.forecast_list)} forecasts')
             else:
                 raise JobException("Weather forecast not found")
         except Exception as e:
